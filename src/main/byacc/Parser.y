@@ -6,74 +6,225 @@
 %}
 
 /* YACC Declarations */
-%token ESP ID NUM
-%token SUMA RESTA MULT DIV LPAR RPAR INT FLOAT IF ELSE WHILE PYC ASIG COMA
+%token INT FLOAT DOUBLE COMPLEX RUNE VOID STRING ID STRUCT PTR LITENT LITRUNE FUNC F LITSTRING T
+%token DISY CONJ EQ NEQ MAYOR MENOR MAYEQ MENEQ SUMA RESTA MULT DIV MOD DIVDIV NOT NEG LPAR RPAR LKEY RKEY LCOR RCOR PYC COMA IF ELSE WHILE DO ASIG BREAK PRINT SCAN RETURN SWITCH P PP CASE DEFAULT
 %nonassoc IF
 %nonassoc ELSE
 %nonassoc WHILE
+%nonassoc DO
+%left DISY
+%left CONJ
+%left EQ NEQ
+%left MAYOR MENOR MAYEQ MENEQ
 %left SUMA RESTA
-%left MULT DIV
+%left MULT DIV MOD DIVDIV
+%left NOT NEG
 %nonassoc LPAR RPAR
+%nonassoc LKEY RKEY
+%nonassoc LCOR RCOR
 
 
 /* Grammar follows */
 %%
 
-pr : ds ss
+programa : declproto declvar declfunc
 ;
 
-ds : d dsp
-;
-
-dsp : d dsp
+declproto : proto tipo ID LPAR args RPAR PYC decl proto
 |
 ;
 
-d : t lv PYC
+declvar : tipo listvar PYC declvar
+|
 ;
 
-t : INT
+tipo : basico compuesto
+| STRUCT LKEY declvar RKEY
+| puntero
+;
+
+puntero : PTR basico
+;
+
+basico : INT
 | FLOAT
+| DOUBLE
+| COMPLEX
+| RUNE
+| VOID
+| STRING
 ;
 
-lv : ID lvp
-;
-
-lvp : COMA ID lvp
+compuesto : LCOR LITENT RCOR compuesto
 |
 ;
 
-ss : s ssp
+listvar : ID listvarp
 ;
 
-ssp : s ssp
+listvarp : COMA ID listvarp
 |
 ;
 
-s : ID ASIG e PYC
-| IF LPAR e RPAR ss ELSE ss
-| WHILE LPAR e RPAR ss
-;
-
-e : f ep
-;
-
-ep : SUMA f ep { $$ = new ParserVal($2.dval + $3.dval); }
-| RESTA f ep { $$ = new ParserVal($2.dval - $3.dval); }
+declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc
 |
 ;
 
-f : g fp
+args : tipo ID argsp
 ;
 
-fp : MULT g fp { $$ = new ParserVal($2.dval * $3.dval); }
-| DIV g fp { $$ = new ParserVal($2.dval / $3.dval); }
+argsp : COMA tipo ID argsp
 |
 ;
 
-g : LPAR e RPAR
-| ID
-| NUM { $$ = 1; }
+bloque : LKEY declaraciones instrucciones RKEY
+;
+
+instrucciones : sentencia instruccionesp
+;
+
+instruccionesp : sentencia instruccionesp
+|
+;
+
+sentencia : parteizq ASIG exp PYC
+| IF LPAR exp RPAR sentencia sentenciaa
+| WHILE LPAR exp RPAR sentencia
+| DO sentencia WHILE LPAR exp RPAR
+| BREAK PYC
+| bloque
+| RETURN sentenciab
+| SWITCH LPAR exp RPAR LKEY casos RKEY
+| PRINT exp PYC
+| SCAN parteizq
+;
+
+sentenciaa : 
+| ELSE sentencia
+;
+
+sentenciab : exp PYC
+| PYC
+;
+
+casos : caso casos
+|
+| predeterminado
+;
+
+caso : CASE opcion PP instrucciones
+;
+
+opcion : LITENT
+| LITRUNE
+;
+
+predeterminado : DEFAULT PP instrucciones
+;
+
+parteizq : ID parteizqp
+;
+
+parteizqp : localizacion
+|
+;
+
+exp : expa expp
+;
+
+expp : DISY expa expp
+|
+;
+
+expa : expb expap
+;
+
+expap : CONJ expb expap
+|
+;
+
+expb : expc expbp
+;
+
+expbp : EQ expc expbp
+| NEQ expc expbp
+|
+;
+
+expc : expd expcp
+;
+
+excp : MAYOR expd expcp
+| MENOR expd expcp
+| MAYEQ expd expcp
+| MENEQ expd expcp
+|
+;
+
+expd : expe expdp
+;
+
+expdp : SUMA expe expdp
+| RESTA expe expdp
+|
+;
+
+expe : expf expep
+;
+
+expep : MULT expf expep
+| DIV expf expep
+| MOD expf expep
+| DIVDIV expf expep
+|
+;
+
+expf : NOT expf
+| NEG expf
+| expg
+;
+
+expg : LPAR exp RPAR
+| ID expgp
+| F
+| T
+| LITSTRING
+| LITENT
+| LITRUNE
+;
+
+expgp : LPAR parametros RPAR
+| localizacion
+|
+;
+
+parametros : listparam
+|
+;
+
+listparam : exp listparamp
+;
+
+listparamp : COMA exp listparamp
+|
+;
+
+localizacion : arreglo
+| estructurado
+;
+
+arreglo : LCOR exp RCOR arreglop
+;
+
+arreglop : LCOR exp RCOR arreglop
+|
+;
+
+estructurado : P ID estructuradop
+;
+
+estructuradop : P ID estructuradop
+|
 ;
 
 %%
