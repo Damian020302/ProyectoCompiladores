@@ -15,11 +15,11 @@ public class BasicBlock {
     }
 
     public void addSuccessor(BasicBlock block){
-        next.add(block);
+        successors.add(block);
     }
 
     public List<BasicBlock> getSuccessors(){
-        return next;
+        return successors;
     }
 
     public LiveVariableAnalyzer.LiveVariableSets getLiveVariableSets(){
