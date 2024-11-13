@@ -158,7 +158,7 @@ expbp : EQ expc expbp
 expc : expd expcp
 ;
 
-excp : MAYOR expd expcp
+expcp : MAYOR expd expcp
 | MENOR expd expcp
 | MAYEQ expd expcp
 | MENEQ expd expcp
