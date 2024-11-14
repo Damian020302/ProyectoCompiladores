@@ -29,28 +29,84 @@ public int getLine() { return yyline; }
 %line
 
 ESP=[ \t\n]
-NUM = ([1-9]([0-9])*|0)+(\.[0-9]+)?([eE][+-]?[0-9]+)?
-ID = [a-zA-Z_][a-zA-Z0-9_]*
+INT = [1-9][0-9]*
+FLOAT = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[fF]
+DOUBLE = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[lL]?
+COMPLEX = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[+-]([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)i
+ID = [a-zA-Z_áéíóúüñÁÉÍÓÚÜÑ][a-zA-Z0-9_áéíóúüñÁÉÍÓÚÜÑ]*
+RUNE = [^\'\\\n]*(\\[\'\\ntrb0])*[^\'\\\n]*
+STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
 
 
 %%
 {ESP}+ { /* No hacer nada */ }
+
+// Palabras reservadas
+"proto" { return Parser.PROTO; }
+"struct" { return Parser.STRUCT; }
+"ptr" { return Parser.PTR; }
 "int" { return Parser.INT; }
 "float" { return Parser.FLOAT; }
+"double" { return Parser.DOUBLE; }
+"complex" { return Parser.COMPLEX; }
+"rune" { return Parser.RUNE; }
+"void" { return Parser.VOID; }
+"string" { return Parser.STRING; }
+"func" { return Parser.FUNC}
 "if" { return Parser.IF; }
-"else" { return Parser.ELSE; }
 "while" { return Parser.WHILE; }
-{NUM} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.NUM; }
+"do" { return Parser.DO; }
+"break" { return Parser.BREAK; }
+"return" { return Parser.RETURN; }
+"switch" { return Parser.SWITCH; }
+"print" { return Parser.PRINT; }
+"scan" { return Parser.SCAN; }
+"else" { return Parser.ELSE; }
+"case" { return Parser.CASE; }
+"default" { return Parser.DEFAULT; }
+"false" { return Parser.F; }
+"true" { return Parser.T; }
+
+// Identificadores
 {ID} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.ID; }
+
+// Constantes numericas
+{INT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITENT; }
+{FLOAT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITFLO; }
+{DOUBLE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITDOU; }
+{COMPLEX} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITCOM; }
+
+// Constantes literales
+{STRING} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITSTRING; }
+{RUNE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITRUNE; }
+
+// Simbolos especiales
+"(" { return Parser.LPAR; }
+")" { return Parser.RPAR; }
 ";" { return Parser.PYC; }
+"{" { return Parser.LKEY; }
+"}" { return Parser.RKEY; }
+"[" { return Parser.LCOR; }
+"]" { return Parser.RCOR; }
+"," { return Parser.COMA; }
 "=" { return Parser.ASIG; }
+":" { return Parser.PP; }
+"||" { return Parser.DISY; }
+"&&" { return Parser.CONJ; }
+"==" { return Parser.EQ; }
+"!=" { return Parser.NEQ; }
+"<" { return Parser.MENOR; }
+"<=" { return Parser.MENEQ; }
+">" { return Parser.MAYOR; }
+">=" { return Parser.MAYEQ; }
 "+" { return Parser.SUMA; }
 "-" { return Parser.RESTA; }
 "*" { return Parser.MULT; }
 "/" { return Parser.DIV; }
-"(" { return Parser.LPAR; }
-")" { return Parser.RPAR; }
-"," { return Parser.COMA; }
-{NUM} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.NUM; }
-\b {System.err.println("Illegal character: "+yytext()); return -1; }
-[^] {System.err.println("Illegal character: "+yytext()); return -1; }
+"%" { return Parser.MOD; }
+"//" { return Parser.DIVDIV; }
+"!" { return Parser.NOT; }
+"." { return Parser.P; }
+
+// Manejo de errores lexicos.
+. {System.err.println("Illegal character: "+yytext()); return -1; }
