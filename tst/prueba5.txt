@@ -1,0 +1,4 @@
+int 
+float d e;
+
+a = d e;
