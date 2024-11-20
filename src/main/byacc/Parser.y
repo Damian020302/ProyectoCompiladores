@@ -6,10 +6,9 @@
 %}
 
 /* YACC Declarations */
-%token PROTO INT FLOAT DOUBLE COMPLEX RUNE VOID STRING ID STRUCT PTR LITENT LITRUNE FUNC F LITSTRING T
-%token DISY CONJ EQ NEQ MAYOR MENOR MAYEQ MENEQ SUMA RESTA MULT DIV MOD DIVDIV NOT NEG 
-%token LPAR RPAR LKEY RKEY LCOR RCOR PYC COMA IF ELSE WHILE DO ASIG BREAK PRINT SCAN RETURN SWITCH P PP CASE DEFAULT
-%nonassoc IF
+%token PROTO INT FLOAT DOUBLE COMPLEX RUNE VOID STRING ID STRUCT PTR LITENT LITRUNE LITFLOAT LITDOUBLE LITCOMPLEX FUNC F LITSTRING T
+%token PYC COMA IF ASIG BREAK PRINT SCAN RETURN P PP
+%nonassoc IFX
 %nonassoc ELSE
 %nonassoc WHILE
 %nonassoc DO
@@ -74,10 +73,14 @@ declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc
 |
 ;
 
-args : tipo ID argsp
+argumentos : listarg
+|
 ;
 
-argsp : COMA tipo ID argsp
+listarg : tipo ID listargsp
+;
+
+listargsp : COMA tipo ID listargsp
 |
 ;
 
@@ -103,8 +106,8 @@ sentencia : parteizq ASIG exp PYC
 | SCAN parteizq
 ;
 
-sentenciaa : 
-| ELSE sentencia
+sentenciaa : ELSE sentencia
+|
 ;
 
 sentenciab : exp PYC
@@ -112,8 +115,8 @@ sentenciab : exp PYC
 ;
 
 casos : caso casos
-|
 | predeterminado
+|
 ;
 
 caso : CASE opcion PP instrucciones
@@ -133,71 +136,35 @@ parteizqp : localizacion
 |
 ;
 
-exp : expa expp
-;
-
-expp : DISY expa expp
-|
-;
-
-expa : expb expap
-;
-
-expap : CONJ expb expap
-|
-;
-
-expb : expc expbp
-;
-
-expbp : EQ expc expbp
-| NEQ expc expbp
-|
-;
-
-expc : expd expcp
-;
-
-expcp : MAYOR expd expcp
-| MENOR expd expcp
-| MAYEQ expd expcp
-| MENEQ expd expcp
-|
-;
-
-expd : expe expdp
-;
-
-expdp : SUMA expe expdp
-| RESTA expe expdp
-|
-;
-
-expe : expf expep
-;
-
-expep : MULT expf expep
-| DIV expf expep
-| MOD expf expep
-| DIVDIV expf expep
-|
-;
-
-expf : NOT expf
-| NEG expf
-| expg
-;
-
-expg : LPAR exp RPAR
-| ID expgp
+exp : exp DISY exp
+| exp CONJ exp
+| exp EQ exp
+| exp NEQ exp
+| exp MAYOR exp
+| exp MENOR exp
+| exp MAYEQ exp
+| exp MENEQ exp
+| exp SUMA exp
+| exp RESTA exp
+| exp MULT exp
+| exp DIV exp
+| exp MOD exp
+| exp DIVDIV exp
+| NOT exp
+| NEG exp
+| LPAR exp RPAR
+| ID expp
 | F
-| T
 | LITSTRING
-| LITENT
+| T
 | LITRUNE
+| LITENT
+| LITFLOAT
+| LITDOUBLE
+| LITCOMPLEX
 ;
 
-expgp : LPAR parametros RPAR
+expp : LPAR parametros RPAR
 | localizacion
 |
 ;
