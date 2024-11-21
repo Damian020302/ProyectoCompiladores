@@ -144,32 +144,32 @@ exp : exp DISY exp {$$ = new ParserVal($1 || $3)}
 | exp MENOR exp {$$ = $1 < $3}
 | exp MAYEQ exp {$$ = $1 >= $3}
 | exp MENEQ exp {$$ = $1 <= $3}
-| exp SUMA exp {$$ = $1 + $3}
-| exp RESTA exp {$$ = $1 - $3}
-| exp MULT exp {$$ = $1 * $3}
-| exp DIV exp {$$ = $1 / $3}
-| exp MOD exp {$$ = $1 % $3}
+| exp SUMA exp {$$ = new ParserVal($1.dval + $3.dval);}
+| exp RESTA exp {$$ = new ParserVal($1.dval - $3.dval);}
+| exp MULT exp {$$ = new ParserVal($1.dval * $3.dval);}
+| exp DIV exp {$$ = new ParserVal($1.dval / $3.dval);}
+| exp MOD exp {$$ = new ParselVal($1.dval % $3.dval);}
 | exp DIVDIV exp {$$ = $1 / $3}
 | NOT exp {$$ = !$2}
 | NEG exp {$$ = -$2}
 | LPAR exp RPAR {$$ = $2}
-| ID expp {$$ = $1}
+| ID expp {$$ = $2}
 | F {$$ = false}
-| LITSTRING
+| LITSTRING {$$ = $1}
 | T {$$ = true}
-| LITRUNE
-| LITENT
-| LITFLOAT
-| LITDOUBLE
-| LITCOMPLEX
+| LITRUNE {$$ = $1}
+| LITENT {$$ = $1}
+| LITFLOAT {$$ = $1}
+| LITDOUBLE {$$ = $1}
+| LITCOMPLEX {$$ = $1}
 ;
 
-expp : LPAR parametros RPAR {System.out.println("Llamada de funcion");}
+expp : LPAR parametros RPAR {$$ = 2;}
 | localizacion {$$ = $1}
 |
 ;
 
-parametros : listparam {System.out.println("Parametros");}
+parametros : listparam {$$ = 1;}
 |
 ;
 
