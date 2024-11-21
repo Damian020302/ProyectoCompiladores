@@ -136,32 +136,32 @@ parteizqp : localizacion {System.out.println("Parte izquierda");}
 |
 ;
 
-exp : exp DISY exp {$$ = new ParserVal($1 || $3)}
-| exp CONJ exp {$$ = $1 && $3}
-| exp EQ exp {$$ = $1 == $3}
-| exp NEQ exp {$$ = $1 != $3}
-| exp MAYOR exp {$$ = $1 > $3}
-| exp MENOR exp {$$ = $1 < $3}
-| exp MAYEQ exp {$$ = $1 >= $3}
-| exp MENEQ exp {$$ = $1 <= $3}
+exp : exp DISY exp {$$ = new ParserVal($1 || $3);}
+| exp CONJ exp {$$ = $1 && $3;}
+| exp EQ exp {$$ = $1 == $3;}
+| exp NEQ exp {$$ = $1 != $3;}
+| exp MAYOR exp {$$ = $1 > $3;}
+| exp MENOR exp {$$ = $1 < $3;}
+| exp MAYEQ exp {$$ = $1 >= $3;}
+| exp MENEQ exp {$$ = $1 <= $3;}
 | exp SUMA exp {$$ = new ParserVal($1.dval + $3.dval);}
 | exp RESTA exp {$$ = new ParserVal($1.dval - $3.dval);}
 | exp MULT exp {$$ = new ParserVal($1.dval * $3.dval);}
 | exp DIV exp {$$ = new ParserVal($1.dval / $3.dval);}
 | exp MOD exp {$$ = new ParselVal($1.dval % $3.dval);}
-| exp DIVDIV exp {$$ = $1 / $3}
-| NOT exp {$$ = !$2}
-| NEG exp {$$ = -$2}
-| LPAR exp RPAR {$$ = $2}
-| ID expp {$$ = $2}
-| F {$$ = false}
-| LITSTRING {$$ = $1}
-| T {$$ = true}
-| LITRUNE {$$ = $1}
-| LITENT {$$ = $1}
-| LITFLOAT {$$ = $1}
-| LITDOUBLE {$$ = $1}
-| LITCOMPLEX {$$ = $1}
+| exp DIVDIV exp {$$ = $1 / $3;}
+| NOT exp {$$ = !$2;}
+| NEG exp {$$ = -$2;}
+| LPAR exp RPAR {$$ = $2;}
+| ID expp {$$ = $2;}
+| F {$$ = 1;}
+| LITSTRING {$$ = $1;}
+| T {$$ = 1;}
+| LITRUNE {$$ = $1;}
+| LITENT {$$ = $1;}
+| LITFLOAT {$$ = $1;}
+| LITDOUBLE {$$ = $1;}
+| LITCOMPLEX {$$ = $1;}
 ;
 
 expp : LPAR parametros RPAR {$$ = 2;}
