@@ -72,9 +72,9 @@ STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
 
 // Constantes numericas
 {INT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITENT; }
-{FLOAT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITFLO; }
-{DOUBLE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITDOU; }
-{COMPLEX} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITCOM; }
+{FLOAT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITFLOAT; }
+{DOUBLE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITDOUBLE; }
+{COMPLEX} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITCOMPLEX; }
 
 // Constantes literales
 {STRING} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITSTRING; }
