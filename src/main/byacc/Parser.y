@@ -30,133 +30,133 @@
 /* Grammar follows */
 %%
 
-programa : declproto declvar declfunc
+programa : declproto declvar declfunc {System.out.println("Compilacion exitosa");}
 ;
 
-declproto : PROTO tipo ID LPAR args RPAR PYC declproto
+declproto : PROTO tipo ID LPAR args RPAR PYC declproto {System.out.println("Prototipo de funcion");}
 |
 ;
 
-declvar : tipo listvar PYC declvar
+declvar : tipo listvar PYC declvar {System.out.println("Declaracion de variables");}
 |
 ;
 
-tipo : basico compuesto
-| STRUCT LKEY declvar RKEY
-| puntero
+tipo : basico compuesto {System.out.println("Tipo de dato");}
+| STRUCT LKEY declvar RKEY {System.out.println("Estructura");}
+| puntero {System.out.println("Puntero");}
 ;
 
-puntero : PTR basico
+puntero : PTR basico {System.out.println("Puntero");}
 ;
 
-basico : INT
-| FLOAT
-| DOUBLE
-| COMPLEX
-| RUNE
-| VOID
-| STRING
+basico : INT {System.out.println("Entero");}
+| FLOAT {System.out.println("Flotante");}
+| DOUBLE {System.out.println("Doble");}
+| COMPLEX {System.out.println("Complejo");}
+| RUNE {System.out.println("Runa");}
+| VOID {System.out.println("Vacio");}
+| STRING {System.out.println("Cadena");}
 ;
 
-compuesto : LCOR LITENT RCOR compuesto
+compuesto : LCOR LITENT RCOR compuesto {System.out.println("Arreglo");}
 |
 ;
 
-listvar : ID listvarp
+listvar : ID listvarp {System.out.println("Lista de variables");}
 ;
 
-listvarp : COMA ID listvarp
+listvarp : COMA ID listvarp {System.out.println("Lista de variables");}
 |
 ;
 
-declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc
+declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {System.out.println("Funcion");}
 |
 ;
 
-argumentos : listarg
+argumentos : listarg {System.out.println("Argumentos");}
 |
 ;
 
-listarg : tipo ID listargsp
+listarg : tipo ID listargsp {System.out.println("Lista de argumentos");}
 ;
 
-listargsp : COMA tipo ID listargsp
+listargsp : COMA tipo ID listargsp {System.out.println("Lista de argumentos");}
 |
 ;
 
-bloque : LKEY declaraciones instrucciones RKEY
+bloque : LKEY declaraciones instrucciones RKEY {System.out.println("Bloque");}
 ;
 
-instrucciones : sentencia instruccionesp
+instrucciones : sentencia instruccionesp {System.out.println("Instrucciones");}
 ;
 
-instruccionesp : sentencia instruccionesp
+instruccionesp : sentencia instruccionesp {System.out.println("Instrucciones");}
 |
 ;
 
-sentencia : parteizq ASIG exp PYC
-| IF LPAR exp RPAR sentencia sentenciaa
-| WHILE LPAR exp RPAR sentencia
-| DO sentencia WHILE LPAR exp RPAR
-| BREAK PYC
-| bloque
-| RETURN sentenciab
-| SWITCH LPAR exp RPAR LKEY casos RKEY
-| PRINT exp PYC
-| SCAN parteizq
+sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
+| IF LPAR exp RPAR sentencia sentenciaa {System.out.println("If");}
+| WHILE LPAR exp RPAR sentencia {System.out.println("While");}
+| DO sentencia WHILE LPAR exp RPAR PYC {System.out.println("Do");}
+| BREAK PYC {System.out.println("Break");}
+| bloque {System.out.println("Bloque");}
+| RETURN sentenciab {System.out.println("Return");}
+| SWITCH LPAR exp RPAR LKEY casos RKEY {System.out.println("Switch");}
+| PRINT exp PYC {System.out.println("Print");}
+| SCAN parteizq {System.out.println("Scan");}
 ;
 
-sentenciaa : ELSE sentencia
+sentenciaa : ELSE sentencia {System.out.println("Else");}
 |
 ;
 
-sentenciab : exp PYC
-| PYC
+sentenciab : exp PYC {System.out.println("Return");}
+| PYC {System.out.println("Return");}
 ;
 
-casos : caso casos
-| predeterminado
+casos : caso casos {System.out.println("Casos");}
+| predeterminado {System.out.println("Predeterminado");}
 |
 ;
 
-caso : CASE opcion PP instrucciones
+caso : CASE opcion PP instrucciones {System.out.println("Caso");}
 ;
 
-opcion : LITENT
-| LITRUNE
+opcion : LITENT {System.out.println("Opcion");}
+| LITRUNE {System.out.println("Opcion");}
 ;
 
-predeterminado : DEFAULT PP instrucciones
+predeterminado : DEFAULT PP instrucciones {System.out.println("Predeterminado");}
 ;
 
-parteizq : ID parteizqp
+parteizq : ID parteizqp {System.out.println("Parte izquierda");}
 ;
 
-parteizqp : localizacion
+parteizqp : localizacion {System.out.println("Parte izquierda");}
 |
 ;
 
-exp : exp DISY exp
-| exp CONJ exp
-| exp EQ exp
-| exp NEQ exp
-| exp MAYOR exp
-| exp MENOR exp
-| exp MAYEQ exp
-| exp MENEQ exp
-| exp SUMA exp
-| exp RESTA exp
-| exp MULT exp
-| exp DIV exp
-| exp MOD exp
-| exp DIVDIV exp
-| NOT exp
-| NEG exp
-| LPAR exp RPAR
-| ID expp
-| F
+exp : exp DISY exp {$$ = new ParserVal($1 || $3)}
+| exp CONJ exp {$$ = $1 && $3}
+| exp EQ exp {$$ = $1 == $3}
+| exp NEQ exp {$$ = $1 != $3}
+| exp MAYOR exp {$$ = $1 > $3}
+| exp MENOR exp {$$ = $1 < $3}
+| exp MAYEQ exp {$$ = $1 >= $3}
+| exp MENEQ exp {$$ = $1 <= $3}
+| exp SUMA exp {$$ = $1 + $3}
+| exp RESTA exp {$$ = $1 - $3}
+| exp MULT exp {$$ = $1 * $3}
+| exp DIV exp {$$ = $1 / $3}
+| exp MOD exp {$$ = $1 % $3}
+| exp DIVDIV exp {$$ = $1 / $3}
+| NOT exp {$$ = !$2}
+| NEG exp {$$ = -$2}
+| LPAR exp RPAR {$$ = $2}
+| ID expp {$$ = $1}
+| F {$$ = false}
 | LITSTRING
-| T
+| T {$$ = true}
 | LITRUNE
 | LITENT
 | LITFLOAT
@@ -164,37 +164,37 @@ exp : exp DISY exp
 | LITCOMPLEX
 ;
 
-expp : LPAR parametros RPAR
-| localizacion
+expp : LPAR parametros RPAR {System.out.println("Llamada de funcion");}
+| localizacion {$$ = $1}
 |
 ;
 
-parametros : listparam
+parametros : listparam {System.out.println("Parametros");}
 |
 ;
 
-listparam : exp listparamp
+listparam : exp listparamp {System.out.println("Lista de parametros");}
 ;
 
-listparamp : COMA exp listparamp
+listparamp : COMA exp listparamp {System.out.println("Lista de parametros");}
 |
 ;
 
-localizacion : arreglo
-| estructurado
+localizacion : arreglo {System.out.println("Localizacion");}
+| estructurado {System.out.println("Localizacion");}
 ;
 
-arreglo : LCOR exp RCOR arreglop
+arreglo : LCOR exp RCOR arreglop {System.out.println("Arreglo");}
 ;
 
-arreglop : LCOR exp RCOR arreglop
+arreglop : LCOR exp RCOR arreglop {System.out.println("Arreglo");}
 |
 ;
 
-estructurado : P ID estructuradop
+estructurado : P ID estructuradop {System.out.println("Estructurado");}
 ;
 
-estructuradop : P ID estructuradop
+estructuradop : P ID estructuradop {System.out.println("Estructurado");}
 |
 ;
 
