@@ -73,7 +73,7 @@ declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {System.out.println("Func
 |
 ;
 
-argumentos : listarg {System.out.println("Argumentos");}
+args : listarg {System.out.println("Argumentos");}
 |
 ;
 
@@ -84,7 +84,7 @@ listargsp : COMA tipo ID listargsp {System.out.println("Lista de argumentos");}
 |
 ;
 
-bloque : LKEY declaraciones instrucciones RKEY {System.out.println("Bloque");}
+bloque : LKEY declvar instrucciones RKEY {System.out.println("Bloque");}
 ;
 
 instrucciones : sentencia instruccionesp {System.out.println("Instrucciones");}
