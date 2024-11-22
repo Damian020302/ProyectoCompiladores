@@ -106,8 +106,8 @@ sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
 | SCAN parteizq {System.out.println("Scan");}
 ;
 
-sentenciaa : ELSE sentencia {System.out.println("Else");}
-|
+sentenciaa : %prec IFX
+| ELSE sentencia {System.out.println("Else");}
 ;
 
 sentenciab : exp PYC {System.out.println("Return");}
@@ -151,7 +151,7 @@ exp : exp DISY exp {$$ = new ParserVal($1 || $3);}
 | exp MOD exp {$$ = new ParselVal($1.dval % $3.dval);}
 | exp DIVDIV exp {$$ = $1 / $3;}
 | NOT exp {$$ = !$2;}
-| NEG exp {$$ = -$2;}
+| RESTA exp %prec NEG {$$ = -$2;}
 | LPAR exp RPAR {$$ = $2;}
 | ID expp {$$ = $2;}
 | F {$$ = 1;}
