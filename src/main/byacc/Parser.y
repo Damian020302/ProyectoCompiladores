@@ -2,7 +2,10 @@
   import java.lang.Math;
   import java.io.Reader;
   import java.io.IOException;
-  import main.jflex.Lexer;
+  import java.util.*;
+  import main.jflex.*;
+  import main.byacc.*;
+  import main.java.*;
 %}
 
 /* YACC Declarations */
@@ -49,13 +52,20 @@ tipo : basico compuesto {System.out.println("Tipo de dato");}
 puntero : PTR basico {System.out.println("Puntero");}
 ;
 
-basico : INT {System.out.println("Entero");}
-| FLOAT {System.out.println("Flotante");}
-| DOUBLE {System.out.println("Doble");}
-| COMPLEX {System.out.println("Complejo");}
-| RUNE {System.out.println("Runa");}
-| VOID {System.out.println("Vacio");}
-| STRING {System.out.println("Cadena");}
+basico : INT {System.out.println("Entero");
+$$ = tablaTipos.addType("int", 0, -1);}
+| FLOAT {System.out.println("Flotante");
+$$ = tablaTipos.addType("float", 0, -1);}
+| DOUBLE {System.out.println("Doble");
+$$ = tablaTipos.addType("double", 0, -1);}
+| COMPLEX {System.out.println("Complejo");
+$$ = tablaTipos.addType("complex", 0, -1);}
+| RUNE {System.out.println("Runa");
+$$ = tablaTipos.addType("rune", 0, -1);}
+| VOID {System.out.println("Vacio");
+$$ = tablaTipos.addType("void", 0, -1);}
+| STRING {System.out.println("Cadena");
+$$ = tablaTipos.addType("string", 0, -1);}
 ;
 
 compuesto : LCOR LITENT RCOR compuesto {System.out.println("Arreglo");}
@@ -136,27 +146,187 @@ parteizqp : localizacion {System.out.println("Parte izquierda");}
 |
 ;
 
-exp : exp DISY exp {$$ = new ParserVal($1 || $3);}
-| exp CONJ exp {$$ = $1 && $3;}
-| exp EQ exp {$$ = $1 == $3;}
-| exp NEQ exp {$$ = $1 != $3;}
-| exp MAYOR exp {$$ = $1 > $3;}
-| exp MENOR exp {$$ = $1 < $3;}
-| exp MAYEQ exp {$$ = $1 >= $3;}
-| exp MENEQ exp {$$ = $1 <= $3;}
-| exp SUMA exp {$$ = new ParserVal($1.dval + $3.dval);}
-| exp RESTA exp {$$ = new ParserVal($1.dval - $3.dval);}
-| exp MULT exp {$$ = new ParserVal($1.dval * $3.dval);}
-| exp DIV exp {$$ = new ParserVal($1.dval / $3.dval);}
-| exp MOD exp {$$ = new ParselVal($1.dval % $3.dval);}
-| exp DIVDIV exp {$$ = $1 / $3;}
+exp : exp DISY exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " || " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp CONJ exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " && " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp EQ exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " == " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp NEQ exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " != " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp MAYOR exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " > " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp MENOR exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " < " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp MAYEQ exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " >= " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp MENEQ exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " <= " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp SUMA exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " + " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación +.");
+  }
+}
+| exp RESTA exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " - " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación -.");
+  }
+}
+| exp MULT exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " * " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación *.");
+  }
+}
+| exp DIV exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " / " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
+| exp MOD exp {
+  if ($1.tipoActual.getName().equals("int") && $3.tipoActual.getName().equals("int")) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+    genCode($$.dir + " = " + $1.dir + " % " + $3.dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación %.");
+  }
+}
+| exp DIVDIV exp {
+  if (compatibles($1.tipoActual, $3.tipoActual)) {
+    $$ = new ParserVal();
+    $$.dir = nuevaTemporal();
+    $$.tipoActual = max($1.tipoActual, $3.tipoActual);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
+    genCode($$.dir + " = " + a1 + " // " + a2);
+  } else {
+    System.err.println("Error: Tipos incompatibles en operación /.");
+  }
+}
 | NOT exp {$$ = !$2;}
 | RESTA exp %prec NEG {$$ = -$2;}
 | LPAR exp RPAR {$$ = $2;}
 | ID expp {$$ = $2;}
-| F {$$ = 1;}
+| F {
+  $$ = new ParserVal();
+  $$.dir = "0"; // Representación fija para True
+  $$.tipo = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+}
 | LITSTRING {$$ = $1;}
-| T {$$ = 1;}
+| T {
+  $$ = new ParserVal();
+  $$.dir = "0"; // Representación fija para True
+  $$.tipo = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+}
 | LITRUNE {$$ = $1;}
 | LITENT {$$ = $1;}
 | LITFLOAT {$$ = $1;}
@@ -201,6 +371,11 @@ estructuradop : P ID estructuradop {System.out.println("Estructurado");}
 %%
 
 Lexer scanner;
+SymbolTable tablaSimbolos = new SymbolTable();
+TypeTable tablaTipos = new TypeTableImpl();
+List<Quadruple> cuadruplos = new ArrayList<>();
+Type tipoActual;
+String dir;
 
 
 public Parser(Reader r) {
@@ -220,6 +395,30 @@ void yyerror(String s)
   System.out.println("Error sintactico:"+s);
 }
 
+boolean compatibles(Type tipo1, Type tipo2){
+  return tipo1.equals(tipo2) || (tipo1.getName().equals("float") && tipo2.getName().equals("int"));
+}
+
+Type max(Type tipo1, Type tipo2) {
+  if (tipo1.getName().equals("float") || tipo2.getName().equals("float")) {
+    return tablaTipos.getType(tablaTipos.addType("float", 0, -1)).orElse(null);
+  }
+  return tipo1; // Por defecto, el tipo menor (int en este caso)
+}
+
+int tempCounter = 0;
+String nuevaTemporal() {
+  return "t" + (tempCounter++);
+}
+
+void genCode(String code) {
+  System.out.println(code);
+}
+
+String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
+  if (tipoOrigen.equals(tipoDestino)) return dir;
+  return dir + "_to_" + tipoDestino.getName(); // Ejemplo de conversión
+}
 
 int yylex()
 {
