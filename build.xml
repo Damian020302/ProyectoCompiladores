@@ -1,0 +1,43 @@
+<!-- P2/build.xml -->
+<project name="AnalizadorLexicoC1" default="run" basedir=".">
+    <!-- Definir directorios -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="jflex.file" value="${src.dir}/main/jflex/Lexer.flex"/>
+    <property name="parser.file" value="${src.dir}/main/byacc/Parser.y"/>
+    <property name="byacc.dir" value="${src.dir}/main/byacc"/>
+
+    <!-- Limpiar el directorio de compilación -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- Generar el analizador léxico con JFlex -->
+    <target name="generate-lexer" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <exec executable="jflex">
+            <arg value="${jflex.file}"/>
+        </exec>
+    </target>
+
+    <!-- Generar el analizador sintáctico -->
+    <target name="generate-parser" depends="generate-lexer">
+        <exec executable="byaccj" dir="${byacc.dir}">
+            <arg line="-J -Jpackage=main.byacc Parser.y"/>
+        </exec>
+    </target>
+
+    <!-- Compilar el código Java -->
+    <target name="compile" depends="generate-parser">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <!-- Ejecutar el analizador léxico -->
+    <target name="run" depends="compile">
+        <java classname="main." fork="true" classpath="${build.dir}">
+            <arg value="src/tst/prueba.txt"/>
+        </java>
+    </target>
+</project>

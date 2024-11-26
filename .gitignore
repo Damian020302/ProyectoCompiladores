@@ -1,0 +1,29 @@
+## Ignoramos la carpeta build
+/build
+
+
+
+##### ignore for macos
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+##### ignore for java
+
+# Compiled class file
+*.class
+
+##### ignore jflex
+Lexer.java~
+Lexer.java
+
+##### ignore byaccj
+Parser.java
+ParserVal.java
+
+
