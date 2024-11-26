@@ -1,7 +1,6 @@
 package main.jflex;
 
-import main.byacc.Parser;
-import main.byacc.ParserVal;
+import main.byacc.*;
 import java.io.Reader;
 
 
@@ -29,13 +28,13 @@ public int getLine() { return yyline; }
 %line
 
 ESP=[ \t\n]
-INT = [1-9][0-9]*
-FLOAT = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[fF]
-DOUBLE = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[lL]?
-COMPLEX = ([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)[+-]([+-]?([1-9][0-9]*|0)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0)\.[0-9]+?)i
+INT = [1-9][0-9]*|0+
+FLOAT = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[fF]
+DOUBLE = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[lL]?
+COMPLEX = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[+-]([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)i
 ID = [a-zA-Z_áéíóúüñÁÉÍÓÚÜÑ][a-zA-Z0-9_áéíóúüñÁÉÍÓÚÜÑ]*
 RUNE = [^\'\\\n]*(\\[\'\\ntrb0])*[^\'\\\n]*
-STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
+STRING = \"[^\"]*\"
 
 
 %%
@@ -52,7 +51,7 @@ STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
 "rune" { return Parser.RUNE; }
 "void" { return Parser.VOID; }
 "string" { return Parser.STRING; }
-"func" { return Parser.FUNC}
+"func" { return Parser.FUNC; }
 "if" { return Parser.IF; }
 "while" { return Parser.WHILE; }
 "do" { return Parser.DO; }
@@ -66,19 +65,6 @@ STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
 "default" { return Parser.DEFAULT; }
 "false" { return Parser.F; }
 "true" { return Parser.T; }
-
-// Identificadores
-{ID} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.ID; }
-
-// Constantes numericas
-{INT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITENT; }
-{FLOAT} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITFLOAT; }
-{DOUBLE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITDOUBLE; }
-{COMPLEX} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITCOMPLEX; }
-
-// Constantes literales
-{STRING} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITSTRING; }
-{RUNE} { yyparser.setYylval(new ParserVal(Double.parseDouble(yytext()))); return Parser.LITRUNE; }
 
 // Simbolos especiales
 "(" { return Parser.LPAR; }
@@ -107,6 +93,47 @@ STRING = "([^\n\"\\\\]|\\\\\"|\\\\n)*"
 "//" { return Parser.DIVDIV; }
 "!" { return Parser.NOT; }
 "." { return Parser.P; }
+
+// Identificadores
+{ID}   { String cadena = yytext();
+         System.out.println("se encontro la cadena " + cadena);
+         yyparser.setYylval(new ParserVal(cadena));
+         return Parser.ID;
+       }
+
+// Constantes numericas
+{INT} { yyparser.setYylval(new ParserVal(Integer.parseInt(yytext())));
+        String numero = Integer.parseInt(yytext());
+        System.out.println("se encontro el numero" + numero);
+        return Parser.INT; 
+       }
+{FLOAT} { String flotante =  Foat.parseFloat(yytext());
+        yyparser.setYylval(new ParserVal(flotante));
+        System.out.println("se encontro el flotante " + flotante);
+        return Parser.FLOAT; 
+       }
+{DOUBLE} { String doble =  Double.parseDouble(yytext());
+        yyparser.setYylval(new ParserVal(doble));
+        System.out.println("se encontro el doble " + doble);
+        return Parser.DOUBLE; 
+       }
+{COMPLEX} {   String complejo = yytext();
+              System.out.println("se encontro el complejo " + complejo);
+              yyparser.setYylval(new ParserVal(complejo));
+              return Parser.COMPLEX;
+       }
+
+// Constantes literales
+{STRING} {    String cadena = yytext().substring(1,yytext);
+              System.out.println("se encontro la cadena " + cadena);
+              yyparser.setYylval(new ParserVal(cadena));
+              return Parser.STRING;
+       }
+{RUNE} {      String cadena = yytext().substring(1,yytext);
+              System.out.println("se encontro la runa " + cadena);
+              yyparser.setYylval(new ParserVal(cadena));
+              return Parser.RUNE;
+       }
 
 // Manejo de errores lexicos.
 . {System.err.println("Illegal character: "+yytext()); return -1; }
