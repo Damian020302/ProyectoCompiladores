@@ -335,7 +335,7 @@ exp : exp DISY exp {
 ;
 
 expp : LPAR parametros RPAR {$$ = 2;}
-| localizacion {$$ = $1}
+| localizacion {$$ = $1;}
 |
 ;
 
