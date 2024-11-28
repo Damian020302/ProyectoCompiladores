@@ -371,12 +371,16 @@ estructuradop : P ID estructuradop {System.out.println("Estructurado");}
 %%
 
 Lexer scanner;
+ControlFlowGraph cfg = new ControlFlowGraph();
+SymbolTableStack pilaSimbolos = new SymbolTableStack();
 SymbolTable tablaSimbolos = new SymbolTable();
 TypeTable tablaTipos = new TypeTableImpl();
 List<Quadruple> cuadruplos = new ArrayList<>();
+BasicBlock bloqueActual;
 Type tipoActual;
-String dir;
-
+String dir = "0";
+int tempCounter = 0; //contador de temporales
+int labelCounter = 0; //contador de etiquetas
 
 public Parser(Reader r) {
   this.scanner = new Lexer(r, this);
@@ -406,18 +410,26 @@ Type max(Type tipo1, Type tipo2) {
   return tipo1; // Por defecto, el tipo menor (int en este caso)
 }
 
-int tempCounter = 0;
 String nuevaTemporal() {
   return "t" + (tempCounter++);
 }
 
+String nuevaEtiqueta() {
+  return "L" + (labelCounter++);
+}
+
 void genCode(String code) {
   System.out.println(code);
+  Quadruple q = new Quadruple(code, null, null, null);
+  cuadruplos.add(q);
+  bloqueActual.addInstruction(q);
 }
 
 String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
   if (tipoOrigen.equals(tipoDestino)) return dir;
-  return dir + "_to_" + tipoDestino.getName(); // Ejemplo de conversión
+  String temp = nuevaTemporal();
+  genCode(temp + " = (cast "+ tipoDestino.getName() ") " + dir);
+  return temp;
 }
 
 int yylex()
