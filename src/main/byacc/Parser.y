@@ -428,7 +428,7 @@ void genCode(String code) {
 String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
   if (tipoOrigen.equals(tipoDestino)) return dir;
   String temp = nuevaTemporal();
-  genCode(temp + " = (cast "+ tipoDestino.getName() ") " + dir);
+  genCode(temp + " = (cast "+ tipoDestino.getName() + ") " + dir);
   return temp;
 }
 
