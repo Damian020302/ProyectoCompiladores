@@ -415,21 +415,76 @@ listparamp : COMA exp listparamp {System.out.println("Lista de parametros");}
 |
 ;
 
-localizacion : arreglo {System.out.println("Localizacion");}
-| estructurado {System.out.println("Localizacion");}
+localizacion : arreglo {
+  System.out.println("Acceso a arrelo");
+  $$ = $1;
+}
+| estructurado {
+  System.out.println("Acceso a estructura");
+  $$ = $1;
+}
 ;
 
-arreglo : LCOR exp RCOR arreglop {System.out.println("Arreglo");}
+arreglo : LCOR exp RCOR arreglop {
+  if ($1.tipoActual.getItems() > 0) { // Validar que queden dimensiones
+    $$ = new ParserVal();
+    String index = ampliar($2.dir, $2.tipoActual, tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null));
+    $$.dir = nuevaTemporal(); // Generar temporal para el resultado del acceso
+    $$.tipoActual = tablaTipos.getType($1.tipoActual.getParenId()).orElse(null); // Reducir dimensión
+    genCode("[]", $1.dir, index, $$.dir); // Generar cuádruplo para acceso a arreglo
+  } else {
+    System.err.println("Error: Acceso a más dimensiones de las que el arreglo tiene.");
+  }
+}
 ;
 
-arreglop : LCOR exp RCOR arreglop {System.out.println("Arreglo");}
+arreglop : LCOR exp RCOR arreglop {
+  if ($1.tipoActual.getItems() > 0) { // Validar que queden dimensiones
+    $$ = new ParserVal();
+    String index = ampliar($2.dir, $2.tipoActual, tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null));
+    $$.dir = nuevaTemporal(); // Generar temporal para el resultado
+    $$.tipoActual = tablaTipos.getType($1.tipoActual.getParenId()).orElse(null); // Reducir dimensión
+    genCode("[]", $1.dir, index, $$.dir);
+  } else {
+    System.err.println("Error: Acceso a más dimensiones de las que el arreglo tiene.");
+  }
 |
 ;
 
-estructurado : P ID estructuradop {System.out.println("Estructurado");}
+estructurado : P ID estructuradop {
+  Optional<Type> tipoEstructura = Optional.ofNullable($1.tipoActual);
+  if (tipoEstructura.isPresent() && tipoEstructura.get().getParentStruct() != null) {
+    Optional<Symbol> miembro = tipoEstructura.get().getParentStruct().lookup($2.sval);
+    if (miembro.isPresent()) {
+      $$ = new ParserVal();
+      $$.dir = nuevaTemporal(); // Generar un temporal para almacenar el resultado
+      $$.tipoActual = tablaTipos.getType(miembro.get().getType()).orElse(null); // Tipo del miembro
+      genCode(".", $1.dir, $2.sval, $$.dir);
+    } else {
+      System.err.println("Error: El miembro " + $2.sval + " no existe en la estructura.");
+    }
+  } else {
+    System.err.println("Error: " + $1.dir + " no es una estructura válida.");
+  }
+}
 ;
 
-estructuradop : P ID estructuradop {System.out.println("Estructurado");}
+estructuradop : P ID estructuradop {
+  Optional<Type> tipoEstructura = Optional.ofNullable($1.tipoActual);
+  if (tipoEstructura.isPresent() && tipoEstructura.get().getParentStruct() != null) {
+    Optional<Symbol> miembro = tipoEstructura.get().getParentStruct().lookup($2.sval);
+    if (miembro.isPresent()) {
+      $$ = new ParserVal();
+      $$.dir = nuevaTemporal(); // Generar un temporal para almacenar el resultado
+      $$.tipoActual = tablaTipos.getType(miembro.get().getType()).orElse(null); // Tipo del miembro
+      genCode(".", $1.dir, $2.sval, $$.dir);
+    } else {
+      System.err.println("Error: El miembro " + $2.sval + " no existe en la estructura.");
+    }
+  } else {
+    System.err.println("Error: No se puede acceder a " + $2.sval + " desde " + $1.dir);
+  }
+}
 |
 ;
 
@@ -499,11 +554,7 @@ void genCode(String op, String arg1, String arg2, String res) {
 String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
   if (tipoOrigen.equals(tipoDestino)) return dir;
   String temp = nuevaTemporal();
-<<<<<<< HEAD
   genCode("(cast)", dir, tipoDestino.getName(), temp);
-=======
-  genCode(temp + " = (cast "+ tipoDestino.getName() + ") " + dir);
->>>>>>> 1d12bf8e2bf43a831b718bd0440ae8375685e186
   return temp;
 }
 
