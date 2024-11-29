@@ -1,4 +1,4 @@
-<!-- P2/build.xml -->
+<!-- build for project A++ -->
 <project name="AnalizadorLexicoC1" default="run" basedir=".">
     <!-- Definir directorios -->
     <property name="src.dir" value="src"/>
@@ -12,32 +12,64 @@
         <delete dir="${build.dir}"/>
     </target>
 
-    <!-- Generar el analizador léxico con JFlex -->
-    <target name="generate-lexer" depends="clean">
+    <!-- Crear el directorio de compilación -->
+    <target name="makedir">
         <mkdir dir="${build.dir}"/>
+    </target>
+
+    <!-- Generar el analizador léxico con JFlex -->
+    <target name="generate-lexer">
         <exec executable="jflex">
             <arg value="${jflex.file}"/>
         </exec>
     </target>
 
     <!-- Generar el analizador sintáctico -->
-    <target name="generate-parser" depends="generate-lexer">
+    <target name="generate-parser">
         <exec executable="byaccj" dir="${byacc.dir}">
             <arg line="-J -Jpackage=main.byacc Parser.y"/>
         </exec>
     </target>
 
     <!-- Compilar el código Java -->
-    <target name="compile" depends="generate-parser">
+    <target name="compile" depends="makedir, generate-lexer, generate-parser">
         <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
             <include name="**/*.java"/>
         </javac>
     </target>
 
-    <!-- Ejecutar el analizador léxico -->
-    <target name="run" depends="compile">
+    <!-- Ejecutar la prueba 0 -->
+    <target name="test-0" depends="compile">
         <java classname="main." fork="true" classpath="${build.dir}">
-            <arg value="src/tst/prueba.txt"/>
+            <arg value="tst/prueba.txt"/>
+        </java>
+    </target>
+
+    <!-- Ejecutar la prueba 1 -->
+    <target name="test-1" depends="test-0">
+        <java classname="main." fork="true" classpath="${build.dir}">
+            <arg value="tst/prueba2.txt"/>
+        </java>
+    </target>
+
+    <!-- Ejecutar la prueba 2 -->
+    <target name="test-2" depends="test-1">
+        <java classname="main." fork="true" classpath="${build.dir}">
+            <arg value="tst/prueba3.txt"/>
+        </java>
+    </target>
+
+    <!-- Ejecutar la prueba 3 -->
+    <target name="test-3" depends="test-2">
+        <java classname="main." fork="true" classpath="${build.dir}">
+            <arg value="tst/prueba4.txt"/>
+        </java>
+    </target>
+
+    <!-- Ejecutar la prueba 4 -->
+    <target name="run" depends="test-3">
+        <java classname="main." fork="true" classpath="${build.dir}">
+            <arg value="tst/prueba5.txt"/>
         </java>
     </target>
 </project>
