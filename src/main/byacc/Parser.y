@@ -105,9 +105,56 @@ instruccionesp : sentencia instruccionesp {System.out.println("Instrucciones");}
 ;
 
 sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
-| IF LPAR exp RPAR sentencia sentenciaa {System.out.println("If");}
-| WHILE LPAR exp RPAR sentencia {System.out.println("While");}
-| DO sentencia WHILE LPAR exp RPAR PYC {System.out.println("Do");}
+| IF LPAR exp RPAR sentencia sentenciaa {
+  String trueEtiqueta = nuevaEtiqueta();
+  String falseEtiqueta = nuevaEtiqueta();
+  pilaLabelTrue.push(trueEtiqueta);
+  pilaLabelFalse.push(falseEtiqueta);
+  genCode("if " , $3.dir, ""," goto " + pilaLabelTrue.peek());
+  genCode("goto " ,"", "", pilaLabelFalse.peek());
+  genCode("label ", pilaLabelTrue.peek(), "" , "");
+  $$ = $5;
+  genCode("label ", pilaLabelFalse.peek(), "" , "");
+  pilaLabelTrue.pop();
+  pilaLabelFalse.pop();
+}
+| WHILE LPAR exp RPAR sentencia {
+  String nextEtiqueta = nuevaEtiqueta();
+  String trueEtiqueta = nuevaEtiqueta();
+  String falseEtiqueta = nuevaEtiqueta();
+  pilaLabelNext.push(nextEtiqueta);
+  pilaLabelTrue.push(trueEtiqueta);
+  pilaLabelFalse.push(falseEtiqueta);
+  genCode("label ", pilaLabelNext.peek(), "" , "");
+  $$ = $3;
+  genCode("if ", $3.dir, "", " goto " + pilaLabelTrue.peek());
+  genCode("goto " ,"", "", pilaLabelFalse.peek());
+  genCode("label ", pilaLabelTrue.peek(), "" , "");
+  $$ = $5;
+  genCode("goto " ,"","", pilaLabelNext.peek());
+  genCode("label ", pilaLabelFalse.peek(), "" , "");
+  pilaLabelNext.pop();
+  pilaLabelTrue.pop();
+  pilaLabelFalse.pop();
+}
+| DO sentencia WHILE LPAR exp RPAR PYC {
+  String nextEtiqueta = nuevaEtiqueta();
+  String trueEtiqueta = nuevaEtiqueta();
+  String falseEtiqueta = nuevaEtiqueta();
+  pilaLabelNext.push(nextEtiqueta);
+  pilaLabelTrue.push(trueEtiqueta);
+  pilaLabelFalse.push(falseEtiqueta);
+  genCode("label ", pilaLabelNext.peek(), "" , "");
+  $$ = $2;
+  genCode("if ", $4.dir, "", " goto " + pilaLabelTrue.peek());
+  genCode("goto " ,"", "", pilaLabelFalse.peek());
+  genCode("label ", pilaLabelTrue.peek(), "" , "");
+  genCode("goto " ,"","", pilaLabelNext.peek());
+  genCode("label ", pilaLabelFalse.peek(), "" , "");
+  pilaLabelNext.pop();
+  pilaLabelTrue.pop();
+  pilaLabelFalse.pop();
+}
 | BREAK PYC {System.out.println("Break");}
 | bloque {System.out.println("Bloque");}
 | RETURN sentenciab {System.out.println("Return");}
@@ -117,7 +164,25 @@ sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
 ;
 
 sentenciaa : %prec IFX
-| ELSE sentencia {System.out.println("Else");}
+| ELSE sentencia {
+  String trueEtiqueta = nuevaEtiqueta();
+  String falseEtiqueta = nuevaEtiqueta();
+  String nextEtiqueta = nuevaEtiqueta();
+  pilaLabelTrue.push(trueEtiqueta);
+  pilaLabelFalse.push(falseEtiqueta);
+  pilaLabelNext.push(nextEtiqueta);
+  genCode("if ", $3.dir, "", " goto " + pilaLabelTrue.peek());
+  genCode("goto " ,"", "", pilaLabelFalse.peek());
+  genCode("label ", pilaLabelTrue.peek(), "" , "");
+  $$ = $5;
+  genCode("goto " ,"","", pilaLabelNext.peek());
+  genCode("label ", pilaLabelFalse.peek(), "" , "");
+  $$ = $7;
+  genCode("label ", pilaLabelNext.peek(), "" , "");
+  pilaLabelTrue.pop();
+  pilaLabelFalse.pop();
+  pilaLabelNext.pop();
+}
 ;
 
 sentenciab : exp PYC {System.out.println("Return");}
@@ -153,7 +218,7 @@ exp : exp DISY exp {
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
     String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
     String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " || " + a2);
+    genCode(" || ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -163,9 +228,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " && " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" && ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -175,9 +240,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " == " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" == ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -187,9 +252,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " != " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" != ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -199,9 +264,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " > " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" > ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -211,9 +276,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " < " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" < ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -223,9 +288,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " >= " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" >= ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -235,9 +300,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " <= " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" <= ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -247,9 +312,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " + " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" + ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación +.");
   }
@@ -259,9 +324,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " - " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" - ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación -.");
   }
@@ -271,9 +336,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " * " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" * ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación *.");
   }
@@ -283,9 +348,9 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
-    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
-    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " / " + a2);
+    String a1 = ampliar($1.dir, $1.tipoActual, $$.tipoActual);
+    String a2 = ampliar($3.dir, $3.tipoActual, $$.tipoActual);
+    genCode(" / ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -295,7 +360,7 @@ exp : exp DISY exp {
     $$ = new ParserVal();
     $$.dir = nuevaTemporal();
     $$.tipoActual = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
-    genCode($$.dir + " = " + $1.dir + " % " + $3.dir);
+    genCode("%", $1.dir, $3.dir, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación %.");
   }
@@ -307,7 +372,7 @@ exp : exp DISY exp {
     $$.tipoActual = max($1.tipoActual, $3.tipoActual);
     String a1 = ampliar($1.dir, $1.tipoActual, $$.tipo);
     String a2 = ampliar($3.dir, $3.tipoActual, $$.tipo);
-    genCode($$.dir + " = " + a1 + " // " + a2);
+    genCode(" // ", a1, a2, $$.dir);
   } else {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
@@ -378,6 +443,9 @@ TypeTable tablaTipos = new TypeTableImpl();
 List<Quadruple> cuadruplos = new ArrayList<>();
 BasicBlock bloqueActual;
 Type tipoActual;
+Stack<BasicBlock> pilaLabelTrue = new Stack<>();
+Stack<BasicBlock> pilaLabelFalse = new Stack<>();
+Stack<BasicBlock> pilaLabelNext = new Stack<>();
 String dir = "0";
 int tempCounter = 0; //contador de temporales
 int labelCounter = 0; //contador de etiquetas
@@ -418,17 +486,20 @@ String nuevaEtiqueta() {
   return "L" + (labelCounter++);
 }
 
-void genCode(String code) {
-  System.out.println(code);
-  Quadruple q = new Quadruple(code, null, null, null);
+/*BasicBlock nuevoBloque() {
+  return new BasicBlock();
+}*/
+
+void genCode(String op, String arg1, String arg2, String res) {
+  Quadruple q = new Quadruple(op, arg1, arg2, res);
   cuadruplos.add(q);
-  bloqueActual.addInstruction(q);
+  System.out.println(q);
 }
 
 String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
   if (tipoOrigen.equals(tipoDestino)) return dir;
   String temp = nuevaTemporal();
-  genCode(temp + " = (cast "+ tipoDestino.getName() ") " + dir);
+  genCode("(cast)", dir, tipoDestino.getName(), temp);
   return temp;
 }
 
