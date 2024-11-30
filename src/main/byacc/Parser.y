@@ -33,23 +33,54 @@
 /* Grammar follows */
 %%
 
-programa : declproto declvar declfunc {System.out.println("Compilacion exitosa");}
+programa : declproto declvar declfunc {
+  cfg = generadorBloques.generateCFG(cuadruplos);
+  System.out.println(cfg);
+}
 ;
 
-declproto : PROTO tipo ID LPAR args RPAR PYC declproto {System.out.println("Prototipo de funcion");}
+declproto : PROTO tipo ID LPAR args RPAR PYC declproto {
+  Symbol proto = new SymbolImpl(0, $2.tipoActual, "prototipo", null);
+  tablaSimbolos.addSymbol($3.text, proto);
+  genCode("proto", $3.text, "args (" + $5.args + ")", $2.tipoActual.getName());
+  System.out.println("Prototipo" + $3.text);
+}
 |
 ;
 
-declvar : tipo listvar PYC declvar {System.out.println("Declaracion de variables");}
+declvar : tipo listvar PYC declvar {
+  for (String var : $2.vars) {
+    Symbol simbolo = new SymbolImpl(0, $1.tipoActual, "variable", null);
+    tablaSimbolos.addSymbol(var, simbolo);
+    genCode("declare", var, $1.tipoActual.getName(), "");
+  }
+  System.out.println("Declaracion de variables" + $2.vars);
+}
 |
 ;
 
-tipo : basico compuesto {System.out.println("Tipo de dato");}
-| STRUCT LKEY declvar RKEY {System.out.println("Estructura");}
-| puntero {System.out.println("Puntero");}
+tipo : basico compuesto {
+  if ($2.dimensiones > 0) {
+    $$ = new ParserVal();
+    $$.tipoActual = tablaTipos.getType(tablaTipos.addType($1.sval, $2.dimensiones, -1)).orElse(null);
+  } else {
+    $$ = 1;
+  }
+}
+| STRUCT LKEY declvar RKEY {
+  $$ = new ParserVal();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("struct", 0, -1)).orElse(null);
+}
+| puntero {
+  $$ = new ParserVal();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("ptr", 0, $1.tipoActual.getParenId())).orElse(null);
+}
 ;
 
-puntero : PTR basico {System.out.println("Puntero");}
+puntero : PTR basico {
+  $$ = new ParserVal();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("ptr<"+$2.tipoActual.getName()+">", 0, $2.tipoActual.getParenId())).orElse(null);
+}
 ;
 
 basico : INT {System.out.println("Entero");
@@ -68,43 +99,90 @@ $$ = tablaTipos.addType("void", 0, -1);}
 $$ = tablaTipos.addType("string", 0, -1);}
 ;
 
-compuesto : LCOR LITENT RCOR compuesto {System.out.println("Arreglo");}
+compuesto : LCOR LITENT RCOR compuesto {
+  $$ = new ParserVal();
+  $$.dimensiones = $4 != null ? $4.dimensiones + 1 : 1;
+}
 |
 ;
 
-listvar : ID listvarp {System.out.println("Lista de variables");}
+listvar : ID listvarp {
+  $$ = new ParserVal();
+  $$.vars = new ArrayList<>();
+  $$.vars.add($1.text);
+  $$.vars.addAll($2.vars);
+}
 ;
 
-listvarp : COMA ID listvarp {System.out.println("Lista de variables");}
+listvarp : COMA ID listvarp {
+  $$ = new ParserVal();
+  $$.vars = new ArrayList<>();
+  $$.vars.add($2.text);
+  $$.vars.addAll($3.vars);
+}
 |
 ;
 
-declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {System.out.println("Funcion");}
+declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {
+  Symbol funcion = new SymbolImpl(0, $2.tipoActual, "funcion", $5.args);
+  tablaSimbolos.addSymbol($3.text, funcion);
+  genCode("func", $3.text, "args (" + $5.args + ")", $2.tipoActual.getName());
+  genCode("end func", "", "", "");
+}
 |
 ;
 
-args : listarg {System.out.println("Argumentos");}
+args : listarg {
+  $$ = new ParserVal();
+  $$.args = $1.args;
+}
 |
 ;
 
-listarg : tipo ID listargsp {System.out.println("Lista de argumentos");}
+listarg : tipo ID listargsp {
+  $$ = new ParserVal();
+  $$.args = new ArrayList<>();
+  $$.args.add(new SymbolImpl(0, $1.tipoActual, "argumento", null));
+  $$.args.addAll($3.args);
+}
 ;
 
-listargsp : COMA tipo ID listargsp {System.out.println("Lista de argumentos");}
+listargsp : COMA tipo ID listargsp {
+  $$ = new ParserVal();
+  $$.args = new ArrayList<>();
+  $$.args.add(new SymbolImpl(0, $2.tipoActual, "argumento", null));
+  $$.args.addAll($4.args);
+}
 |
 ;
 
-bloque : LKEY declvar instrucciones RKEY {System.out.println("Bloque");}
+bloque : LKEY declvar instrucciones RKEY {
+  BasicBlock nuevoBloque = new BasicBlock();
+  nuevoBloque.addInstructions(new Quadruple("label", "", "", ""));
+  nuevoBloque.getInstructions().addAll(cuadruplos);
+  nuevoBloque.addInstructions(new Quadruple("end", "", "", ""));
+  cfg.addBasicBlock(nuevoBloque);
+}
 ;
 
-instrucciones : sentencia instruccionesp {System.out.println("Instrucciones");}
+instrucciones : sentencia instruccionesp {
+  BasicBlock nuevoBloque = new BasicBlock();
+  nuevoBloque.addInstructions(new Quadruple("instrucciones", $1.dir, "", ""));
+  nuevoBloque.addInstructions(new Quadruple("continuar", "", "", ""));
+}
 ;
 
-instruccionesp : sentencia instruccionesp {System.out.println("Instrucciones");}
+instruccionesp : sentencia instruccionesp {
+  BasicBlock nuevoBloque = new BasicBlock();
+  nuevoBloque.addInstructions(new Quadruple("instrucciones", $1.dir, "", ""));
+  nuevoBloque.addInstructions(new Quadruple("continuar", "", "", ""));
+}
 |
 ;
 
-sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
+sentencia : parteizq ASIG exp PYC {
+  genCode("=", $1.dir, $3.dir, $1.dir);
+}
 | IF LPAR exp RPAR sentencia sentenciaa {
   String trueEtiqueta = nuevaEtiqueta();
   String falseEtiqueta = nuevaEtiqueta();
@@ -156,11 +234,33 @@ sentencia : parteizq ASIG exp PYC {System.out.println("Asignacion");}
   pilaLabelFalse.pop();
 }
 | BREAK PYC {System.out.println("Break");}
-| bloque {System.out.println("Bloque");}
-| RETURN sentenciab {System.out.println("Return");}
-| SWITCH LPAR exp RPAR LKEY casos RKEY {System.out.println("Switch");}
-| PRINT exp PYC {System.out.println("Print");}
-| SCAN parteizq {System.out.println("Scan");}
+| bloque {
+  System.out.println("Bloque");
+  BasicBlock nuevoBloque = generadorBloques.generateCFG(cuadruplos);
+  cfg.addBasicBlock(nuevoBloque);
+}
+| RETURN sentenciab {
+  System.out.println("Return");
+  genCode("return", $2.dir, "", "");
+}
+| SWITCH LPAR exp RPAR LKEY casos RKEY {
+  String switchTemp = nuevaEtiqueta();
+  genCode("switch", $3.dir, "", switchTemp);
+  for (caso: casos){
+    String caseLabel = nuevaEtiqueta();
+    genCode("if", switchTemp, "==", caso.value, "goto " + caseEtiqueta);
+    genCode("goto", "", "", "nextCaseLabel"); 
+    genCode("label", caseLabel, "", "");
+  }
+}
+| PRINT exp PYC {
+  System.out.println("Print");
+  genCode("print", $3.dir, "", "");
+}
+| SCAN parteizq {
+  System.out.println("Scan");
+  genCode("scan", "", "", $1.dir);
+}
 ;
 
 sentenciaa : %prec IFX
@@ -185,8 +285,14 @@ sentenciaa : %prec IFX
 }
 ;
 
-sentenciab : exp PYC {System.out.println("Return");}
-| PYC {System.out.println("Return");}
+sentenciab : exp PYC {
+  System.out.println("Return");
+  genCode("return", $1.dir, "", "");
+}
+| PYC {
+  System.out.println(";");
+  genCode(";","", "", "");
+}
 ;
 
 casos : caso casos {System.out.println("Casos");}
@@ -194,11 +300,25 @@ casos : caso casos {System.out.println("Casos");}
 |
 ;
 
-caso : CASE opcion PP instrucciones {System.out.println("Caso");}
+caso : CASE opcion PP instrucciones {
+  String caseLabel = nuevaEtiqueta();
+  genCode("if", $3.dir, "==", $1.dir, "goto " + caseLabel);
+  genCode("goto", "", "", "nextCaseLabel");
+  genCode("label", caseLabel, "", "");
+  $$ = 5;
+}
 ;
 
-opcion : LITENT {System.out.println("Opcion");}
-| LITRUNE {System.out.println("Opcion");}
+opcion : LITENT {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+}
+| LITRUNE {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("rune", 0, -1)).orElse(null);
+}
 ;
 
 predeterminado : DEFAULT PP instrucciones {System.out.println("Predeterminado");}
@@ -377,26 +497,71 @@ exp : exp DISY exp {
     System.err.println("Error: Tipos incompatibles en operación /.");
   }
 }
-| NOT exp {$$ = !$2;}
-| RESTA exp %prec NEG {$$ = -$2;}
-| LPAR exp RPAR {$$ = $2;}
-| ID expp {$$ = $2;}
+| NOT exp {
+  $$ = new ParserVal();
+  $$.dir = nuevaTemporal();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+  genCode("!", $2.dir, "", $$.dir);
+}
+| RESTA exp %prec NEG {
+  $$ = new ParserVal();
+  $$.dir = nuevaTemporal();
+  $$.tipoActual = $2.tipoActual;
+  genCode("-", $2.dir, "", $$.dir);
+}
+| LPAR exp RPAR {
+  $$ = $2;
+}
+| ID expp {
+  Optional<Symbol> simbolo = pilaSimbolos.lookup($1.sval);
+  if (simbolo.isPresent()) {
+    $$ = new ParserVal();
+    $$.dir = $1.sval;
+    $$.tipoActual = tablaTipos.getType(simbolo.get().getType()).orElse(null);
+  } else {
+    System.err.println("Error: " + $1.sval + " no está definido.");
+  }
+}
 | F {
   $$ = new ParserVal();
   $$.dir = "0"; // Representación fija para True
   $$.tipo = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
 }
-| LITSTRING {$$ = $1;}
+| LITSTRING {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("string", 0, -1)).orElse(null);
+}
 | T {
   $$ = new ParserVal();
-  $$.dir = "0"; // Representación fija para True
+  $$.dir = "1"; // Representación fija para True
   $$.tipo = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
 }
-| LITRUNE {$$ = $1;}
-| LITENT {$$ = $1;}
-| LITFLOAT {$$ = $1;}
-| LITDOUBLE {$$ = $1;}
-| LITCOMPLEX {$$ = $1;}
+| LITRUNE {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("rune", 0, -1)).orElse(null);
+}
+| LITENT {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("int", 0, -1)).orElse(null);
+}
+| LITFLOAT {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("float", 0, -1)).orElse(null);
+}
+| LITDOUBLE {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("double", 0, -1)).orElse(null);
+}
+| LITCOMPLEX {
+  $$ = new ParserVal();
+  $$.dir = yylex();
+  $$.tipoActual = tablaTipos.getType(tablaTipos.addType("complex", 0, -1)).orElse(null);
+}
 ;
 
 expp : LPAR parametros RPAR {$$ = 2;}
@@ -404,14 +569,21 @@ expp : LPAR parametros RPAR {$$ = 2;}
 |
 ;
 
-parametros : listparam {$$ = 1;}
+parametros : listparam {
+  System.out.println("Parametros");
+  $$ = 1;
+}
 |
 ;
 
-listparam : exp listparamp {System.out.println("Lista de parametros");}
+listparam : exp listparamp {
+  genCode("param", $1.dir, "", "");
+}
 ;
 
-listparamp : COMA exp listparamp {System.out.println("Lista de parametros");}
+listparamp : COMA exp listparamp {
+  genCode("param", $2.dir, "", "");
+}
 |
 ;
 
@@ -497,6 +669,7 @@ SymbolTable tablaSimbolos = new SymbolTable();
 TypeTable tablaTipos = new TypeTableImpl();
 List<Quadruple> cuadruplos = new ArrayList<>();
 BasicBlock bloqueActual;
+BasicBlockGenerator generadorBloques = new BasicBlockGenerator();
 Type tipoActual;
 Stack<BasicBlock> pilaLabelTrue = new Stack<>();
 Stack<BasicBlock> pilaLabelFalse = new Stack<>();
@@ -507,6 +680,8 @@ int labelCounter = 0; //contador de etiquetas
 
 public Parser(Reader r) {
   this.scanner = new Lexer(r, this);
+  bloqueActual = new BasicBlock();
+  pilaSimbolos.push(tablaSimbolos);
 }
 
 public void setYylval(ParserVal yylval) {
@@ -515,6 +690,8 @@ public void setYylval(ParserVal yylval) {
 
 public void parse() {
   this.yyparse();
+  cfg = generadorBloques.generateCFG(cuadruplos);
+  System.out.println(cfg);
 }
 
 void yyerror(String s)
@@ -523,7 +700,9 @@ void yyerror(String s)
 }
 
 boolean compatibles(Type tipo1, Type tipo2){
-  return tipo1.equals(tipo2) || (tipo1.getName().equals("float") && tipo2.getName().equals("int"));
+  return tipo1.equals(tipo2) ||
+  (tipo1.getName().equals("float") && tipo2.getName().equals("int")) ||
+  (tipo1.getName().equals("int") && tipo2.getName().equals("float"));
 }
 
 Type max(Type tipo1, Type tipo2) {
@@ -548,6 +727,7 @@ String nuevaEtiqueta() {
 void genCode(String op, String arg1, String arg2, String res) {
   Quadruple q = new Quadruple(op, arg1, arg2, res);
   cuadruplos.add(q);
+  bloqueActual.addInstruction(q);
   System.out.println(q);
 }
 
