@@ -1,3 +1,5 @@
+package main.java;
+
 import main.byacc.Parser;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

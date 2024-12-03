@@ -1,3 +1,5 @@
+package main.java;
+
 public interface Type {
     String getName();        
     short getItems();

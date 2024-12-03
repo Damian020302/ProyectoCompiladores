@@ -41,7 +41,7 @@ programa : declproto declvar declfunc {
 declproto : PROTO tipo ID LPAR args RPAR PYC declproto {
   System.out.println("Entrada declproto");
 }
-|  System.out.println("Epsilon ");
+|  {System.out.println("Epsilon ");}
 ;
 
 declvar : tipo listvar PYC declvar {
@@ -67,12 +67,12 @@ puntero : PTR basico {
 ;
 
 basico : INT {System.out.println("Entrada basico1");}
-| FLOAT {System.out.println("Entrada basico2");
-| DOUBLE {System.out.println("Entrada basico3");
-| COMPLEX {System.out.println("Entrada basico4");
-| RUNE {System.out.println("Entrada basico5");
-| VOID {System.out.println("Entrada basico6");
-| STRING {System.out.println("Entrada basico7");
+| FLOAT {System.out.println("Entrada basico2");}
+| DOUBLE {System.out.println("Entrada basico3");}
+| COMPLEX {System.out.println("Entrada basico4");}
+| RUNE {System.out.println("Entrada basico5");}
+| VOID {System.out.println("Entrada basico6");}
+| STRING {System.out.println("Entrada basico7");}
 ;
 
 compuesto : LCOR LITENT RCOR compuesto {
@@ -149,6 +149,7 @@ sentencia : parteizq ASIG exp PYC {
 }
 | RETURN sentenciab {
   System.out.println("Entrada sentencia7");
+}
 | SWITCH LPAR exp RPAR LKEY casos RKEY {
   System.out.println("Entrada sentencia8");
 }
@@ -273,6 +274,7 @@ exp : exp DISY exp {
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
+}
 | LITDOUBLE {
   System.out.println("Entrada exp25");
 }
@@ -318,6 +320,7 @@ arreglo : LCOR exp RCOR arreglop {
 
 arreglop : LCOR exp RCOR arreglop {
   System.out.println("Entrada arreglop");
+}
 |
 ;
 
@@ -336,7 +339,7 @@ estructuradop : P ID estructuradop {
 
 Lexer scanner;
 ControlFlowGraph cfg = new ControlFlowGraph();
-SymbolTableStack pilaSimbolos = new SymbolTableStack();
+SymbolTableStack pilaSimbolos = new SymbolTableStackImpl();
 SymbolTable tablaSimbolos = new SymbolTable();
 TypeTable tablaTipos = new TypeTableImpl();
 List<Quadruple> cuadruplos = new ArrayList<>();

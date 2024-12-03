@@ -1,3 +1,5 @@
+package main.java;
+
 public class TypeParentImpl implements TypeParent {
     private int parenId;
     private SymbolTable parentStruct;

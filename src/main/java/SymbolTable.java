@@ -1,3 +1,5 @@
+package main.java;
+
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -7,6 +9,10 @@ public class SymbolTable {
 
     public SymbolTable(SymbolTable parent) {
         this.parent = parent;
+    }
+
+    public SymbolTable() {
+        this.parent = null;
     }
 
     public void addSymbol(String id, Symbol symbol) {

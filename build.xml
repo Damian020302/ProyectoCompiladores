@@ -4,7 +4,7 @@
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="build"/>
     <property name="jflex.file" value="${src.dir}/main/jflex/Lexer.flex"/>
-    <property name="parser.file" value="${src.dir}/main/byacc/Parser.y"/>
+    <property name="parser.file" value="${src.dir}/main/byacc/Sintactico.y"/>
     <property name="byacc.dir" value="${src.dir}/main/byacc"/>
 
     <!-- Limpiar el directorio de compilación -->
@@ -27,7 +27,7 @@
     <!-- Generar el analizador sintáctico -->
     <target name="generate-parser">
         <exec executable="byaccj" dir="${byacc.dir}">
-            <arg line="-J -Jpackage=main.byacc Parser.y"/>
+            <arg line="-J -Jpackage=main.byacc Sintactico.y"/>
         </exec>
     </target>
 
@@ -40,35 +40,34 @@
 
     <!-- Ejecutar la prueba 0 -->
     <target name="test-0" depends="compile">
-        <java classname="main." fork="true" classpath="${build.dir}">
-            <arg value="tst/prueba.txt"/>
+        <java classname="main.java.Main" fork="true" classpath="${build.dir}">
         </java>
     </target>
 
     <!-- Ejecutar la prueba 1 -->
     <target name="test-1" depends="test-0">
-        <java classname="main." fork="true" classpath="${build.dir}">
+        <java classname="main.java.Main" fork="true" classpath="${build.dir}">
             <arg value="tst/prueba2.txt"/>
         </java>
     </target>
 
     <!-- Ejecutar la prueba 2 -->
     <target name="test-2" depends="test-1">
-        <java classname="main." fork="true" classpath="${build.dir}">
+        <java classname="main.java.Main" fork="true" classpath="${build.dir}">
             <arg value="tst/prueba3.txt"/>
         </java>
     </target>
 
     <!-- Ejecutar la prueba 3 -->
     <target name="test-3" depends="test-2">
-        <java classname="main." fork="true" classpath="${build.dir}">
+        <java classname="main.java.Main" fork="true" classpath="${build.dir}">
             <arg value="tst/prueba4.txt"/>
         </java>
     </target>
 
     <!-- Ejecutar la prueba 4 -->
     <target name="run" depends="test-3">
-        <java classname="main." fork="true" classpath="${build.dir}">
+        <java classname="main.java.Main" fork="true" classpath="${build.dir}">
             <arg value="tst/prueba5.txt"/>
         </java>
     </target>
