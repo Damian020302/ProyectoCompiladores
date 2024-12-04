@@ -10,7 +10,7 @@
 
 /* YACC Declarations */
 %token PROTO INT FLOAT DOUBLE COMPLEX RUNE VOID STRING ID STRUCT PTR LITENT LITRUNE LITFLOAT LITDOUBLE LITCOMPLEX FUNC F LITSTRING T
-%token PYC COMA IF ASIG BREAK PRINT SCAN RETURN P PP
+%token PYC IF ASIG BREAK PRINT SCAN RETURN PP
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc WHILE
@@ -18,6 +18,8 @@
 %nonassoc SWITCH
 %nonassoc CASE
 %nonassoc DEFAULT
+$left P
+$left COMA
 %left DISY
 %left CONJ
 %left EQ NEQ
@@ -81,15 +83,10 @@ compuesto : LCOR LITENT RCOR compuesto {
 |
 ;
 
-listvar : ID listvarp {
+listvar : listvar COMA ID
+| ID {
   System.out.println("Entrada listvar");
 }
-;
-
-listvarp : COMA ID listvarp {
-  System.out.println("Entrada listvarp");
-}
-|
 ;
 
 declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {
@@ -104,15 +101,12 @@ args : listarg {
 |
 ;
 
-listarg : tipo ID listargsp {
+listarg : listarg COMA tipo ID {
   System.out.println("Entrada listarg");
 }
-;
-
-listargsp : COMA tipo ID listargsp {
-  System.out.println("Entrada listargsp");
+| tipo ID {
+  System.out.println("Entrada listarg");
 }
-|
 ;
 
 bloque : LKEY declvar instrucciones RKEY {
@@ -120,15 +114,10 @@ bloque : LKEY declvar instrucciones RKEY {
 }
 ;
 
-instrucciones : sentencia instruccionesp {
+instrucciones : isntrucciones sentencia {
   System.out.println("Entrada instrucciones");
 }
-;
-
-instruccionesp : sentencia instruccionesp {
-  System.out.println("Entrada instruccionesp");
-}
-|
+| sentencia
 ;
 
 sentencia : parteizq ASIG exp PYC {
@@ -294,15 +283,12 @@ parametros : listparam {
 |
 ;
 
-listparam : exp listparamp {
+listparam : listparam COMA exp {
   System.out.println("Entrada listparam");
 }
-;
-
-listparamp : COMA exp listparamp {
-  System.out.println("Entrada listparamp");
+| exp {
+  System.out.println("Entrada listparam");
 }
-|
 ;
 
 localizacion : arreglo {
@@ -313,26 +299,20 @@ localizacion : arreglo {
 }
 ;
 
-arreglo : LCOR exp RCOR arreglop {
+arreglo : arreglo LCOR expo RCOR {
+  System.out.println("Entrada arreglo1");
+}
+| LCOR exp RCOR {
   System.out.println("Entrada arreglo");
 }
 ;
 
-arreglop : LCOR exp RCOR arreglop {
-  System.out.println("Entrada arreglop");
-}
-|
-;
-
-estructurado : P ID estructuradop {
+estructurado : estructurado P ID {
   System.out.println("Entrada estructurado");
 }
-;
-
-estructuradop : P ID estructuradop {
+| estructuradop : P ID {
   System.out.println("Entrada estructuradop");
 }
-|
 ;
 
 %%
