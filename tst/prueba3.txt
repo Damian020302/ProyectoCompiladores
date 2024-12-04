@@ -1,7 +1,5 @@
-int a, b_c;
-float d, e;
+string s;
 
-a = 1 + 3;
-b_c = a * 23;
-d = 0.1;
-e = d / 2.33;
+func void hola_mundo(){
+    print s;
+}

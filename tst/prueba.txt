@@ -1,5 +1,1 @@
-int a, _b;
-float c, d;
-
-a = 1 + 3;
-_b = a + 23;
+proto int foo (int x, int y );

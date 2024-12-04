@@ -11,6 +11,7 @@ public class SymbolTable {
         this.parent = parent;
     }
 
+    // este constructor es para evitar un error en la linea 668 del parser.y
     public SymbolTable() {
         this.parent = null;
     }
