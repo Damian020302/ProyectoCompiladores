@@ -1,3 +1,5 @@
+package main.java;
+
 import java.util.Optional;
 
 public interface SymbolTableStack {

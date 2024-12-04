@@ -1,3 +1,5 @@
+package main.java;
+
 public class TypeImpl implements Type{
     private String name;
     private short items;

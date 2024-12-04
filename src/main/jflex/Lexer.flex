@@ -27,7 +27,7 @@ public int getLine() { return yyline; }
 %unicode
 %line
 
-ESP=[ \t\n\r]
+ESP=[ \t\n]
 INT = [1-9][0-9]*|0+
 FLOAT = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[fF]
 DOUBLE = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[lL]?
@@ -39,6 +39,7 @@ STRING = \"[^\"]*\"
 
 %%
 {ESP}+ { /* No hacer nada */ }
+
 
 // Palabras reservadas
 "proto" { return Parser.PROTO; }
@@ -85,7 +86,6 @@ STRING = \"[^\"]*\"
 "<=" { return Parser.MENEQ; }
 ">" { return Parser.MAYOR; }
 ">=" { return Parser.MAYEQ; }
-"+" { return Parser.SUMA; }
 "-" { return Parser.RESTA; }
 "*" { return Parser.MULT; }
 "/" { return Parser.DIV; }
@@ -93,6 +93,7 @@ STRING = \"[^\"]*\"
 "//" { return Parser.DIVDIV; }
 "!" { return Parser.NOT; }
 "." { return Parser.P; }
+"+" { System.out.println("se encontro una suma ");return Parser.SUMA; }
 
 // Identificadores
 {ID}   { String cadena = yytext();
@@ -102,17 +103,17 @@ STRING = \"[^\"]*\"
        }
 
 // Constantes numericas
-{INT} { yyparser.setYylval(new ParserVal(Integer.parseInt(yytext())));
-        String numero = Integer.parseInt(yytext());
+{INT} { String numero = yytext();
         System.out.println("se encontro el numero" + numero);
-        return Parser.INT; 
+        yyparser.setYylval(new ParserVal(numero));
+        return Parser.LITENT; 
        }
-{FLOAT} { String flotante =  Foat.parseFloat(yytext());
+{FLOAT} { String flotante = yytext();
         yyparser.setYylval(new ParserVal(flotante));
         System.out.println("se encontro el flotante " + flotante);
         return Parser.FLOAT; 
        }
-{DOUBLE} { String doble =  Double.parseDouble(yytext());
+{DOUBLE} { String doble =  yytext();
         yyparser.setYylval(new ParserVal(doble));
         System.out.println("se encontro el doble " + doble);
         return Parser.DOUBLE; 
@@ -124,16 +125,20 @@ STRING = \"[^\"]*\"
        }
 
 // Constantes literales
-{STRING} {    String cadena = yytext().substring(1,yytext);
+{STRING} {    String cadena = yytext();
+              cadena = cadena.substring(1,cadena.length());
               System.out.println("se encontro la cadena " + cadena);
               yyparser.setYylval(new ParserVal(cadena));
               return Parser.STRING;
        }
-{RUNE} {      String cadena = yytext().substring(1,yytext);
-              System.out.println("se encontro la runa " + cadena);
-              yyparser.setYylval(new ParserVal(cadena));
+{RUNE} {      String runa = yytext();
+              runa = runa.substring(1,runa.length());
+              System.out.println("se encontro la runa " + runa);
+              yyparser.setYylval(new ParserVal(runa));
               return Parser.RUNE;
        }
+
+
 
 // Manejo de errores lexicos.
 . {System.err.println("Illegal character: "+yytext()); return -1; }
