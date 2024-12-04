@@ -366,7 +366,7 @@ public void setYylval(ParserVal yylval) {
 public void parse() {
   this.yyparse();
   cfg = generadorBloques.generateCFG(cuadruplos);
-  System.out.println(cfg);
+  //System.out.println(cfg);
 }
 
 void yyerror(String s)
