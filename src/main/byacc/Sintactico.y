@@ -114,7 +114,7 @@ bloque : LKEY declvar instrucciones RKEY {
 }
 ;
 
-instrucciones : isntrucciones sentencia {
+instrucciones : instrucciones sentencia {
   System.out.println("Entrada instrucciones");
 }
 | sentencia
@@ -299,7 +299,7 @@ localizacion : arreglo {
 }
 ;
 
-arreglo : arreglo LCOR expo RCOR {
+arreglo : arreglo LCOR exp RCOR {
   System.out.println("Entrada arreglo1");
 }
 | LCOR exp RCOR {
@@ -310,7 +310,7 @@ arreglo : arreglo LCOR expo RCOR {
 estructurado : estructurado P ID {
   System.out.println("Entrada estructurado");
 }
-| estructuradop : P ID {
+| P ID {
   System.out.println("Entrada estructuradop");
 }
 ;
