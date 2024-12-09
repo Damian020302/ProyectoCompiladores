@@ -311,7 +311,7 @@ arreglo : arreglo LCOR exp RCOR {
 estructurado : estructurado P ID {
   System.out.println("Entrada estructurado");
 }
-| estructuradop : P ID {
+| P ID {
   System.out.println("Entrada estructuradop");
 }
 ;
