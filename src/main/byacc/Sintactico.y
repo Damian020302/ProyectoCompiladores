@@ -10,7 +10,7 @@
 
 /* YACC Declarations */
 %token PROTO INT FLOAT DOUBLE COMPLEX RUNE VOID STRING ID STRUCT PTR LITENT LITRUNE LITFLOAT LITDOUBLE LITCOMPLEX FUNC F LITSTRING T
-%token PYC IF ASIG BREAK PRINT SCAN RETURN PP
+%token PYC IF BREAK PRINT SCAN RETURN PP
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc WHILE
@@ -30,6 +30,7 @@ $left COMA
 %nonassoc LPAR RPAR
 %nonassoc LKEY RKEY
 %nonassoc LCOR RCOR
+%nonassoc ASIG
 
 
 /* Grammar follows */
@@ -114,7 +115,7 @@ bloque : LKEY declvar instrucciones RKEY {
 }
 ;
 
-instrucciones : isntrucciones sentencia {
+instrucciones : instrucciones sentencia {
   System.out.println("Entrada instrucciones");
 }
 | sentencia
@@ -299,7 +300,7 @@ localizacion : arreglo {
 }
 ;
 
-arreglo : arreglo LCOR expo RCOR {
+arreglo : arreglo LCOR exp RCOR {
   System.out.println("Entrada arreglo1");
 }
 | LCOR exp RCOR {
