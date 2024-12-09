@@ -111,17 +111,17 @@ STRING = \"[^\"]*\"
 {FLOAT} { String flotante = yytext();
         yyparser.setYylval(new ParserVal(flotante));
         System.out.println("se encontro el flotante " + flotante);
-        return Parser.FLOAT; 
+        return Parser.LITFLOAT; 
        }
 {DOUBLE} { String doble =  yytext();
         yyparser.setYylval(new ParserVal(doble));
         System.out.println("se encontro el doble " + doble);
-        return Parser.DOUBLE; 
+        return Parser.LITDOUBLE; 
        }
 {COMPLEX} {   String complejo = yytext();
               System.out.println("se encontro el complejo " + complejo);
               yyparser.setYylval(new ParserVal(complejo));
-              return Parser.COMPLEX;
+              return Parser.LITCOMPLEX;
        }
 
 // Constantes literales
@@ -129,7 +129,7 @@ STRING = \"[^\"]*\"
               cadena = cadena.substring(1,cadena.length());
               System.out.println("se encontro la cadena " + cadena);
               yyparser.setYylval(new ParserVal(cadena));
-              return Parser.STRING;
+              return Parser.LITSTRING;
        }
 {RUNE} {      String runa = yytext();
               runa = runa.substring(1,runa.length());
