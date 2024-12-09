@@ -219,6 +219,12 @@ exp : exp DISY exp {
 }
 | exp SUMA exp {
   System.out.println("Entrada exp9");
+  System.out.println($$);
+  System.out.println($1.sval);
+  System.out.println($3.sval);
+  int e1 = Integer.valueOf($3.sval);
+  System.out.println("en la suma el primero es" + e1);
+  
 }
 | exp RESTA exp {
   System.out.println("Entrada exp10");
@@ -261,6 +267,9 @@ exp : exp DISY exp {
 }
 | LITENT {
   System.out.println("Entrada exp23");
+  System.out.println($1.sval);
+  
+  $$ = new ParserVal($1.sval);
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
@@ -347,12 +356,13 @@ public void setYylval(ParserVal yylval) {
 public void parse() {
   this.yyparse();
   cfg = generadorBloques.generateCFG(cuadruplos);
-  //System.out.println(cfg);
+  System.out.println(this.yyparse());
 }
 
 void yyerror(String s)
 {
-  System.out.println("Error sintactico:"+s);
+  int linea = scanner.getLine() + 1;
+  System.out.println("Error sintactico: "+ s + " en la linea: " + linea);
 }
 
 boolean compatibles(Type tipo1, Type tipo2){
