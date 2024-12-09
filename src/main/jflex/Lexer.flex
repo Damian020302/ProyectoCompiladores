@@ -135,7 +135,7 @@ STRING = \"[^\"]*\"
               runa = runa.substring(1,runa.length());
               System.out.println("se encontro la runa " + runa);
               yyparser.setYylval(new ParserVal(runa));
-              return Parser.RUNE;
+              return Parser.LITRUNE;
        }
 
 
