@@ -1,4 +1,52 @@
-int 
-float d e;
-
-a = d e;
+struct{
+    int a;
+    int b;
+    float c;
+}a, b;
+float x, y;
+int m, n;
+int c;
+int i, j;
+float[5][7][3] w;
+int z;
+int w1;
+func int suma(int x, int y){
+    w1= 5;
+    z = 1;
+    return z;
+}
+func int main(){
+    a.a= 8;
+    a.b= 2;
+    a.c = 1.5;
+    m= 7;
+    n = 15;
+    c = suma(m, n);
+    i = 0;
+    j = 0;
+    k = 0;
+    while(i < 5){
+        while(j<7){
+            while(k<3){
+                a[i][j][k]= 0;
+                k = k + 1;
+            }
+            j = j + 1;
+        }
+        i = i + 1
+    }
+    i = 0;
+    j = 0;
+    k = 0;
+    while(i < 5){
+        while(j<7){
+            while(k<3){
+                a[i][j][k] = a[i][j][k] +3;
+                k = k + 1;
+            }
+            j = j + 1;
+        }
+        i = i + 1
+    }
+    return 0;
+}

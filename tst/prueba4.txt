@@ -1,4 +1,4 @@
-int a
+int a;
 float d, e;
 
 a = 1 + 3;

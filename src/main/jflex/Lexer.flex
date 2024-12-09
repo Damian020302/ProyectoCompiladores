@@ -70,13 +70,13 @@ STRING = \"[^\"]*\"
 // Simbolos especiales
 "(" { return Parser.LPAR; }
 ")" { return Parser.RPAR; }
-";" { return Parser.PYC; }
+";" { System.out.println("encontro ;");return Parser.PYC; }
 "{" { return Parser.LKEY; }
 "}" { return Parser.RKEY; }
 "[" { return Parser.LCOR; }
 "]" { return Parser.RCOR; }
 "," { return Parser.COMA; }
-"=" { return Parser.ASIG; }
+"=" { System.out.println("encontro ="); return Parser.ASIG;}
 ":" { return Parser.PP; }
 "||" { return Parser.DISY; }
 "&&" { return Parser.CONJ; }
