@@ -252,18 +252,28 @@ exp : exp DISY exp {
 }
 | ID expp {
   System.out.println("Entrada exp18");
+  $$ = new ParserValExtended($1.sval);
 }
 | F {
   System.out.println("Entrada exp19");
+  $$ = new ParserValExtended($1.ival);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("bool");
 }
 | LITSTRING {
   System.out.println("Entrada exp20");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("string");
 }
 | T {
   System.out.println("Entrada exp21");
+  // pendiente
+  $$ = new ParserValExtended($1.ival);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("bool");
 }
 | LITRUNE {
   System.out.println("Entrada exp22");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
 }
 | LITENT {
   System.out.println("Entrada exp23");
@@ -274,12 +284,18 @@ exp : exp DISY exp {
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("float");
 }
 | LITDOUBLE {
   System.out.println("Entrada exp25");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("double");
 }
 | LITCOMPLEX {
   System.out.println("Entrada exp26");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("complex");
 }
 ;
 

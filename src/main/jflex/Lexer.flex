@@ -28,10 +28,11 @@ public int getLine() { return yyline; }
 %line
 
 ESP=[ \t\n]
-INT = [1-9][0-9]*|0+
+// los complejos son de la forma n.n+m.mi
+COMPLEX = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[+-]([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)i
 FLOAT = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[fF]
 DOUBLE = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[lL]?
-COMPLEX = ([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)[+-]([+-]?([1-9][0-9]*|0+)\.[0-9]+[eE][+-]?[0-9]+?|[+-]?([1-9][0-9]*|0+)\.[0-9]+?)i
+INT = [1-9][0-9]*|0+
 ID = [a-zA-Z_áéíóúüñÁÉÍÓÚÜÑ][a-zA-Z0-9_áéíóúüñÁÉÍÓÚÜÑ]*
 RUNE = \'[^\']\'
 STRING = \"[^\"]*\"
@@ -64,8 +65,10 @@ STRING = \"[^\"]*\"
 "else" { return Parser.ELSE; }
 "case" { return Parser.CASE; }
 "default" { return Parser.DEFAULT; }
-"false" { return Parser.F; }
-"true" { return Parser.T; }
+"false" {     yyparser.setYylval(new ParserValExtended(0));
+              return Parser.F; }
+"true" {     yyparser.setYylval(new ParserValExtended(1));
+              return Parser.T; }
 
 // Simbolos especiales
 "(" { return Parser.LPAR; }
@@ -98,15 +101,15 @@ STRING = \"[^\"]*\"
 // Identificadores
 {ID}   { String cadena = yytext();
          System.out.println("se encontro la cadena " + cadena);
-         yyparser.setYylval(new ParserVal(cadena));
+         yyparser.setYylval(new ParserValExtended(cadena));
          return Parser.ID;
        }
 
 // Constantes numericas
-{INT} { String numero = yytext();
-        System.out.println("se encontro el numero" + numero);
-        yyparser.setYylval(new ParserValExtended(numero));
-        return Parser.LITENT; 
+{COMPLEX} {   String complejo = yytext();
+              System.out.println("se encontro el complejo " + complejo);
+              yyparser.setYylval(new ParserValExtended(complejo));
+              return Parser.LITCOMPLEX;
        }
 {FLOAT} { String flotante = yytext();
         yyparser.setYylval(new ParserValExtended(flotante));
@@ -118,21 +121,21 @@ STRING = \"[^\"]*\"
         System.out.println("se encontro el doble " + doble);
         return Parser.LITDOUBLE; 
        }
-{COMPLEX} {   String complejo = yytext();
-              System.out.println("se encontro el complejo " + complejo);
-              yyparser.setYylval(new ParserValExtended(complejo));
-              return Parser.LITCOMPLEX;
+{INT} { String numero = yytext();
+        System.out.println("se encontro el numero" + numero);
+        yyparser.setYylval(new ParserValExtended(numero));
+        return Parser.LITENT; 
        }
 
 // Constantes literales
 {STRING} {    String cadena = yytext();
-              cadena = cadena.substring(1,cadena.length());
+              cadena = cadena.substring(1,cadena.length()-1);
               System.out.println("se encontro la cadena " + cadena);
               yyparser.setYylval(new ParserValExtended(cadena));
               return Parser.LITSTRING;
        }
 {RUNE} {      String runa = yytext();
-              runa = runa.substring(1,runa.length());
+              runa = runa.substring(1,runa.length()-1);
               System.out.println("se encontro la runa " + runa);
               yyparser.setYylval(new ParserValExtended(runa));
               return Parser.LITRUNE;

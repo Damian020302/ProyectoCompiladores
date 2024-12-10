@@ -33,6 +33,14 @@ public class ParserValExtended extends ParserVal {
         this.lista = null;
     }
 
+    public ParserValExtended(int ival) {
+        super(ival); // Llama al constructor original de ParserVal
+        this.tipo = -1;
+        this.dir = null;
+        this.base = null;
+        this.lista = null;
+    }
+
     @Override
     public String toString() {
         return "ParserValExtended{" +
