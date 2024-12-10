@@ -268,8 +268,9 @@ exp : exp DISY exp {
 | LITENT {
   System.out.println("Entrada exp23");
   System.out.println($1.sval);
-  $$ = new ParserVal($1.sval);
+  $$ = new ParserValExtended($1.sval);
   (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
+  System.out.println("Este es el tipo " + ((ParserValExtended)$$).tipo + " de la tabla de tipos");
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
