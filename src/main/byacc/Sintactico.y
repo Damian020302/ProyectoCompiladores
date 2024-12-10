@@ -69,17 +69,39 @@ puntero : PTR basico {
 }
 ;
 
-basico : INT {System.out.println("Entrada basico1");}
-| FLOAT {System.out.println("Entrada basico2");}
-| DOUBLE {System.out.println("Entrada basico3");}
-| COMPLEX {System.out.println("Entrada basico4");}
-| RUNE {System.out.println("Entrada basico5");}
-| VOID {System.out.println("Entrada basico6");}
-| STRING {System.out.println("Entrada basico7");}
+basico : INT {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
+}
+| FLOAT {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("float");
+}
+| DOUBLE {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("double");
+}
+| COMPLEX {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("complex");
+}
+| RUNE {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
+}
+| VOID {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("void");
+}
+| STRING {
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("string");
+}
 ;
 
 compuesto : LCOR LITENT RCOR compuesto {
-  System.out.println("Entrada compuesto");
+  $$ = new ParserValExtended($2.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
 }
 |
 ;
@@ -176,10 +198,12 @@ caso : CASE opcion PP instrucciones {
 ;
 
 opcion : LITENT {
-  System.out.println("Entrada opcion1");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
 }
 | LITRUNE {
-  System.out.println("Entrada opcion2");
+  $$ = new ParserValExtended($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
 }
 ;
 
