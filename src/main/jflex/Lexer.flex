@@ -70,13 +70,13 @@ STRING = \"[^\"]*\"
 // Simbolos especiales
 "(" { return Parser.LPAR; }
 ")" { return Parser.RPAR; }
-";" { System.out.println("encontro ;");return Parser.PYC; }
+";" { return Parser.PYC; }
 "{" { return Parser.LKEY; }
 "}" { return Parser.RKEY; }
 "[" { return Parser.LCOR; }
 "]" { return Parser.RCOR; }
 "," { return Parser.COMA; }
-"=" { System.out.println("encontro ="); return Parser.ASIG;}
+"=" { return Parser.ASIG;}
 ":" { return Parser.PP; }
 "||" { return Parser.DISY; }
 "&&" { return Parser.CONJ; }
@@ -93,7 +93,7 @@ STRING = \"[^\"]*\"
 "//" { return Parser.DIVDIV; }
 "!" { return Parser.NOT; }
 "." { return Parser.P; }
-"+" { System.out.println("se encontro una suma ");return Parser.SUMA; }
+"+" { return Parser.SUMA; }
 
 // Identificadores
 {ID}   { String cadena = yytext();
@@ -105,22 +105,22 @@ STRING = \"[^\"]*\"
 // Constantes numericas
 {INT} { String numero = yytext();
         System.out.println("se encontro el numero" + numero);
-        yyparser.setYylval(new ParserVal(numero));
+        yyparser.setYylval(new ParserValExtended(numero));
         return Parser.LITENT; 
        }
 {FLOAT} { String flotante = yytext();
-        yyparser.setYylval(new ParserVal(flotante));
+        yyparser.setYylval(new ParserValExtended(flotante));
         System.out.println("se encontro el flotante " + flotante);
         return Parser.LITFLOAT; 
        }
 {DOUBLE} { String doble =  yytext();
-        yyparser.setYylval(new ParserVal(doble));
+        yyparser.setYylval(new ParserValExtended(doble));
         System.out.println("se encontro el doble " + doble);
         return Parser.LITDOUBLE; 
        }
 {COMPLEX} {   String complejo = yytext();
               System.out.println("se encontro el complejo " + complejo);
-              yyparser.setYylval(new ParserVal(complejo));
+              yyparser.setYylval(new ParserValExtended(complejo));
               return Parser.LITCOMPLEX;
        }
 
@@ -128,13 +128,13 @@ STRING = \"[^\"]*\"
 {STRING} {    String cadena = yytext();
               cadena = cadena.substring(1,cadena.length());
               System.out.println("se encontro la cadena " + cadena);
-              yyparser.setYylval(new ParserVal(cadena));
+              yyparser.setYylval(new ParserValExtended(cadena));
               return Parser.LITSTRING;
        }
 {RUNE} {      String runa = yytext();
               runa = runa.substring(1,runa.length());
               System.out.println("se encontro la runa " + runa);
-              yyparser.setYylval(new ParserVal(runa));
+              yyparser.setYylval(new ParserValExtended(runa));
               return Parser.LITRUNE;
        }
 

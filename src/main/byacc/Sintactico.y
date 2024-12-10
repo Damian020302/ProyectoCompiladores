@@ -221,7 +221,7 @@ exp : exp DISY exp {
   System.out.println("Entrada exp9");
   System.out.println($$);
   System.out.println($1.sval);
-  System.out.println($3.sval);
+  System.out.println(((ParserValExtended)$3).dir);
   int e1 = Integer.valueOf($3.sval);
   System.out.println("en la suma el primero es" + e1);
   
@@ -269,7 +269,7 @@ exp : exp DISY exp {
   System.out.println("Entrada exp23");
   System.out.println($1.sval);
   
-  $$ = new ParserVal($1.sval);
+  $$ = new ParserValExtended($1.sval);
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
