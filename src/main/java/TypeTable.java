@@ -15,4 +15,6 @@ public interface TypeTable {
     
     int addType(String name, int items, int parent);
     int addType(String name, SymbolTable parent);   
+
+    int getId(String name);
 }

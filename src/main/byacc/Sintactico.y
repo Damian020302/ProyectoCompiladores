@@ -268,8 +268,8 @@ exp : exp DISY exp {
 | LITENT {
   System.out.println("Entrada exp23");
   System.out.println($1.sval);
-  
-  $$ = new ParserValExtended($1.sval);
+  $$ = new ParserVal($1.sval);
+  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
@@ -347,6 +347,18 @@ public Parser(Reader r) {
   this.scanner = new Lexer(r, this);
   bloqueActual = new BasicBlock();
   pilaSimbolos.push(tablaSimbolos);
+  iniciarTipos();
+}
+
+public void iniciarTipos() {
+  tablaTipos.addType("int", 1, -1);
+  tablaTipos.addType("float", 4, -1);
+  tablaTipos.addType("double", 8, -1);
+  tablaTipos.addType("complex", 16, -1);
+  tablaTipos.addType("rune", 2, -1);
+  tablaTipos.addType("void", 0, -1);
+  tablaTipos.addType("string", 0, -1);
+  tablaTipos.addType("bool", 1, -1);
 }
 
 public void setYylval(ParserVal yylval) {
@@ -355,7 +367,7 @@ public void setYylval(ParserVal yylval) {
 
 public void parse() {
   this.yyparse();
-  cfg = generadorBloques.generateCFG(cuadruplos);
+  //cfg = generadorBloques.generateCFG(cuadruplos);
   System.out.println(this.yyparse());
 }
 

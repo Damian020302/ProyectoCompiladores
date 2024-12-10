@@ -1,6 +1,7 @@
 package main.java;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class TypeTableImpl implements TypeTable{
@@ -72,6 +73,16 @@ public class TypeTableImpl implements TypeTable{
         Type type = new TypeImpl(name, (short) 0, (short) 0, -1, parent);
         types.put(idActual, type);
         return idActual++;
+    }
+
+    @Override
+    public int getId(String name) {
+        for (Map.Entry<Integer, Type> entry : types.entrySet()) {
+            if (entry.getValue().getName().equals(name)) {
+                return entry.getKey();
+            }
+        }
+        return -1; // Retorna -1 si no encuentra el tipo
     }
 
 }
