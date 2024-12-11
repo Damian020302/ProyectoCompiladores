@@ -71,37 +71,45 @@ puntero : PTR basico {
 
 basico : INT {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
+  int idType = tablaTipos.getId("int");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | FLOAT {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("float");
+  int idType = tablaTipos.getId("float");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | DOUBLE {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("double");
+  int idType = tablaTipos.getId("double");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | COMPLEX {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("complex");
+  int idType = tablaTipos.getId("complex");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | RUNE {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
+  int idType = tablaTipos.getId("rune");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | VOID {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("void");
+  int idType = tablaTipos.getId("void");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | STRING {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("string");
+  int idType = tablaTipos.getId("string");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 ;
 
 compuesto : LCOR LITENT RCOR compuesto {
   $$ = new ParserValExtended($2.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
+  int idType = tablaTipos.getId("int");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 |
 ;
@@ -199,11 +207,13 @@ caso : CASE opcion PP instrucciones {
 
 opcion : LITENT {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
+  int idType = tablaTipos.getId("int");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITRUNE {
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
+  int idType = tablaTipos.getId("rune");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 ;
 
@@ -243,11 +253,20 @@ exp : exp DISY exp {
 }
 | exp SUMA exp {
   System.out.println("Entrada exp9");
-  System.out.println($$);
-  System.out.println($1.sval);
-  System.out.println(((ParserValExtended)$3).dir);
-  int e1 = Integer.valueOf($3.sval);
-  System.out.println("en la suma el primero es" + e1);
+  $$ = new ParserValExtended($1.sval);
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  if (compatibles(tipo1, tipo2)) {
+      //Calcular el tipo resultante
+      Type tipoResultante = max(tipo1, tipo2);
+      ((ParserValExtended)$$).tipo = tipoResultante;
+      ((ParserValExtended)$$).dir = nuevaTemporal();
+      genCode("+", ((ParserValExtended)$1).dir, ((ParserValExtended)$3).dir, ((ParserValExtended)$$).dir);
+    } else {
+      System.err.println("Error: Tipos incompatibles en suma.");
+    }
+
+
   
 }
 | exp RESTA exp {
@@ -281,45 +300,53 @@ exp : exp DISY exp {
 | F {
   System.out.println("Entrada exp19");
   $$ = new ParserValExtended($1.ival);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("bool");
+  int idType = tablaTipos.getId("bool");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITSTRING {
   System.out.println("Entrada exp20");
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("string");
+  int idType = tablaTipos.getId("string");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | T {
   System.out.println("Entrada exp21");
   // pendiente
   $$ = new ParserValExtended($1.ival);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("bool");
+  int idType = tablaTipos.getId("bool");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITRUNE {
   System.out.println("Entrada exp22");
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("rune");
+  int idType = tablaTipos.getId("rune");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITENT {
   System.out.println("Entrada exp23");
   System.out.println($1.sval);
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("int");
-  System.out.println("Este es el tipo " + ((ParserValExtended)$$).tipo + " de la tabla de tipos");
+  int idType = tablaTipos.getId("int");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
+  System.out.println("Este es el tipo " + ((ParserValExtended)$$).tipo.getName() + " de la tabla de tipos");
 }
 | LITFLOAT {
   System.out.println("Entrada exp24");
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("float");
+  int idType = tablaTipos.getId("float");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITDOUBLE {
   System.out.println("Entrada exp25");
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("double");
+  int idType = tablaTipos.getId("double");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITCOMPLEX {
   System.out.println("Entrada exp26");
   $$ = new ParserValExtended($1.sval);
-  (((ParserValExtended)$$).tipo) = tablaTipos.getId("complex");
+  int idType = tablaTipos.getId("complex");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 ;
 

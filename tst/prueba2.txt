@@ -1,6 +1,6 @@
 func int foo (int x, int y){
     int w, z;
     string s;
-    w = 3.0f;
+    w = 1 + 2;
     return w;
 }
