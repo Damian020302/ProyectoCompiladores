@@ -228,67 +228,272 @@ parteizqp : localizacion {System.out.println("Entrada ParteIzquierdaP");}
 ;
 
 exp : exp DISY exp {
-  System.out.println("Entrada exp1");
-}
-| exp CONJ exp {
-  System.out.println("Entrada exp2");
-}
-| exp EQ exp {
-  System.out.println("Entrada exp3");
-}
-| exp NEQ exp {
-  System.out.println("Entrada exp4");
-}
-| exp MAYOR exp {
-  System.out.println("Entrada exp5");
-}
-| exp MENOR exp {
-  System.out.println("Entrada exp6");
-}
-| exp MAYEQ exp {
-  System.out.println("Entrada exp7");
-}
-| exp MENEQ exp {
-  System.out.println("Entrada exp8");
-}
-| exp SUMA exp {
-  System.out.println("Entrada exp9");
-  $$ = new ParserValExtended($1.sval);
+  $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
   if (compatibles(tipo1, tipo2)) {
-      //Calcular el tipo resultante
-      Type tipoResultante = max(tipo1, tipo2);
-      ((ParserValExtended)$$).tipo = tipoResultante;
-      ((ParserValExtended)$$).dir = nuevaTemporal();
-      genCode("+", ((ParserValExtended)$1).dir, ((ParserValExtended)$3).dir, ((ParserValExtended)$$).dir);
-    } else {
-      System.err.println("Error: Tipos incompatibles en suma.");
-    }
-
-
-  
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("||", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en disyuncion.");
+  }
+}
+| exp CONJ exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("&&", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en conjuncion.");
+  }
+}
+| exp EQ exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("==", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en igualdad.");
+  }
+}
+| exp NEQ exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("!=", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en no igualdad.");
+  }
+}
+| exp MAYOR exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode(">", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles.");
+  }
+}
+| exp MENOR exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("<", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en iguales.");
+  }
+}
+| exp MAYEQ exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode(">=", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en iguales.");
+  }
+}
+| exp MENEQ exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("<=", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en iguales.");
+  }
+}
+| exp SUMA exp {
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("+", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en suma.");
+  }
 }
 | exp RESTA exp {
-  System.out.println("Entrada exp10");
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("-", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en multiplicacion.");
+  }
 }
 | exp MULT exp {
   System.out.println("Entrada exp11");
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("*", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en multiplicacion.");
+  }
 }
 | exp DIV exp {
-  System.out.println("Entrada exp12");
+  System.out.println("Entrada exp11");
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("/", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en division.");
+  }
 }
 | exp MOD exp {
-  System.out.println("Entrada exp13");
+  System.out.println("Entrada exp11");
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("%", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles en modulo.");
+  }
 }
 | exp DIVDIV exp {
-  System.out.println("Entrada exp14");
+  System.out.println("Entrada exp11");
+  $$ = new ParserValExtended();
+  Type tipo1 = ((ParserValExtended)$1).tipo;
+  Type tipo2 = ((ParserValExtended)$3).tipo;
+  ((ParserValExtended)$1).dir = ((ParserValExtended)$1).sval;
+  ((ParserValExtended)$3).dir = ((ParserValExtended)$3).sval;
+  if (compatibles(tipo1, tipo2)) {
+    //Calcular el tipo resultante
+    Type tipoResultante = max(tipo1, tipo2);
+    ((ParserValExtended)$$).tipo = tipoResultante;
+    ((ParserValExtended)$$).dir = nuevaTemporal();
+    String a1 = ampliar(((ParserValExtended)$1).dir, tipo1, tipoResultante);
+    String a2 = ampliar(((ParserValExtended)$3).dir, tipo2, tipoResultante);
+    genCode("//", a1, a2, ((ParserValExtended)$$).dir);
+  } else {
+    System.err.println("Error: Tipos incompatibles.");
+  }
 }
 | NOT exp {
-  System.out.println("Entrada exp15");
+  $$ = new ParserValExtended();
+  ((ParserValExtended)$$).dir = nuevaTemporal();
+  String a = ampliar(((ParserValExtended)$2).dir, ((ParserValExtended)$2).tipo, ((ParserValExtended)$2).tipo);
+  genCode("!", a, null, ((ParserValExtended)$$).dir);
 }
 | RESTA exp %prec NEG {
-  System.out.println("Entrada exp16");
+  $$ = new ParserValExtended();
+  ((ParserValExtended)$$).dir = nuevaTemporal();
+  String a = ampliar(((ParserValExtended)$2).dir, ((ParserValExtended)$2).tipo, ((ParserValExtended)$2).tipo);
+  genCode("!", a, null, ((ParserValExtended)$$).dir);
 }
 | LPAR exp RPAR {
   System.out.println("Entrada exp17");

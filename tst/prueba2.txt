@@ -2,5 +2,6 @@ func int foo (int x, int y){
     int w, z;
     string s;
     w = 1 + 2;
+    z = 2 * 2;
     return w;
 }
