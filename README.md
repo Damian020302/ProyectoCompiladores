@@ -67,3 +67,9 @@ ant
 ````
 
 esto  generara una carpeta llamada build en la raiz del proyecto, con todos los archivos .class del proyecto y despues  ejecutara el main del proyecto con cada uno de los archivos de prueba.
+
+En caso de usar windows se tiene que modificar el archivo build.xml en la linea 22 y cambiar jflex por jflex.bat.
+
+```xml
+<exec executable="jflex.bat">
+```

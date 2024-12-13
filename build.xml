@@ -17,7 +17,7 @@
         <mkdir dir="${build.dir}"/>
     </target>
 
-    <!-- Generar el analizador léxico con JFlex -->
+    <!-- Generar el analizador léxico con JFlex  aqui va jflex.bat en el exec, en caso de usar windows-->
     <target name="generate-lexer">
         <exec executable="jflex">
             <arg value="${jflex.file}"/>
