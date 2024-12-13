@@ -2,9 +2,13 @@
 Proyecto de la materia de Compiladores del semestre 2025-1
 
 ### Profesores.
-Profesora: Ariel Adara Mercado Martínez.
-Ayudante: Yessica Janeth Pablo Martínez.
-Ayudante Laboratorio: Carlos Gerardo Acosta Hernández.
+- Profesora: Ariel Adara Mercado Martínez.
+
+
+- Ayudante: Yessica Janeth Pablo Martínez.
+
+
+- Ayudante Laboratorio: Carlos Gerardo Acosta Hernández.
 
 ### Integrantes.
 - 317243705: Andrea Rojas Fuentes
