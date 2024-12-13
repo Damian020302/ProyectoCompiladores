@@ -235,15 +235,12 @@ predeterminado : DEFAULT PP instrucciones {
 ;
 
 
-parteizq : ID parteizqp {
-  System.out.println("parteizq -> ID parteizqp");
+parteizq : ID localizacion {
+  System.out.println("parteizq -> ID localizacion");
 }
-;
-
-parteizqp : localizacion {
-  System.out.println("parteizqp -> localizacion");
+| ID {
+  System.out.println("parteizq -> ID");
 }
-|
 ;
 
 exp : exp DISY exp {
