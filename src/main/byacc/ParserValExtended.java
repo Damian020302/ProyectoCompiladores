@@ -3,7 +3,7 @@ package main.byacc;
 import java.util.List;
 import main.java.*;
 
-public class ParserValExtended extends ParserVal {
+public class ParserValExtended extends ParserVal{
     public Type tipo; // Representa el tipo semántico
     public String dir; // Dirección temporal
     public String base; // Identificador base (usado en estructuras y arreglos)

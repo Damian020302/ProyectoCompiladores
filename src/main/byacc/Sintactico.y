@@ -37,69 +37,76 @@ $left COMA
 %%
 
 programa : declproto declvar declfunc {
-  System.out.println("Entrada programa");
+  System.out.println("programa -> declproto declvar declfunc");
 }
 ;
 
 declproto : PROTO tipo ID LPAR args RPAR PYC declproto {
-  System.out.println("Entrada declproto");
+  System.out.println("declproto -> proto tipo id (args); declproto");
 }
-|  {System.out.println("Epsilon ");}
+|  
 ;
 
 declvar : tipo listvar PYC declvar {
-  System.out.println("Entrada declvar");
+  System.out.println("declvar -> tipo listvar ; declvar");
 }
 |
 ;
 
 tipo : basico compuesto {
-  System.out.println("Entrada tipo1");
+  System.out.println("tipo -> basico compuesto");
 }
 | STRUCT LKEY declvar RKEY {
-  System.out.println("Entrada tipo2");
+  System.out.println("tipo -> struct{declvar}");
 }
 | puntero {
-  System.out.println("Entrada tipo3");
+  System.out.println("tipo -> puntero");
 }
 ;
 
 puntero : PTR basico {
-  System.out.println("Entrada puntero1");
+  System.out.println("puntero -> ptr basico");
 }
 ;
 
 basico : INT {
+  System.out.println("basico -> int");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("int");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | FLOAT {
+  System.out.println("basico -> float");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("float");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | DOUBLE {
+  System.out.println("basico -> double");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("double");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | COMPLEX {
+  System.out.println("basico -> complex");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("complex");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | RUNE {
+  System.out.println("basico -> rune");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("rune");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | VOID {
+  System.out.println("basico -> void");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("void");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | STRING {
+  System.out.println("basico -> string");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("string");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
@@ -107,6 +114,7 @@ basico : INT {
 ;
 
 compuesto : LCOR LITENT RCOR compuesto {
+  System.out.println("compuesto -> [literal_entera] compuesto");
   $$ = new ParserValExtended($2.sval);
   int idType = tablaTipos.getId("int");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
@@ -116,118 +124,130 @@ compuesto : LCOR LITENT RCOR compuesto {
 
 listvar : listvar COMA ID
 | ID {
-  System.out.println("Entrada listvar");
+  System.out.println("listvar, id");
 }
 ;
 
 declfunc : FUNC tipo ID LPAR args RPAR bloque declfunc {
-  System.out.println("Entrada declfunc");
+  System.out.println("declfunc -> func tipo id(args)bloque declfunc");
 }
 |
 ;
 
 args : listarg {
-  System.out.println("Entrada args");
+  System.out.println("args -> listarg");
 }
 |
 ;
 
 listarg : listarg COMA tipo ID {
-  System.out.println("Entrada listarg");
+  System.out.println("listarg -> listarg, tipo id");
 }
 | tipo ID {
-  System.out.println("Entrada listarg");
+  System.out.println("listarg -> tipo id");
 }
 ;
 
 bloque : LKEY declvar instrucciones RKEY {
-  System.out.println("Entrada bloque");
+  System.out.println("bloque -> { declvar instrucciones }");
 }
 ;
 
 instrucciones : instrucciones sentencia {
-  System.out.println("Entrada instrucciones");
+  System.out.println("instrucciones -> instrucciones sentencia");
 }
-| sentencia
+| sentencia { 
+  System.out.println("instrucciones -> sentencia");
+}
 ;
 
 sentencia : parteizq ASIG exp PYC {
-  System.out.println("Entrada sentencia1");
+  System.out.println("sentencia -> parteizq = exp;");
 }
 | IF LPAR exp RPAR sentencia sentenciaa {
-  System.out.println("Entrada sentencia2");
+  System.out.println("sentencia -> if(exp) sentencia sentenciaa");
 }
 | WHILE LPAR exp RPAR sentencia {
-  System.out.println("Entrada sentencia3");
+  System.out.println("sentencia -> while(exp) sentencia");
 }
 | DO sentencia WHILE LPAR exp RPAR PYC {
-  System.out.println("Entrada sentencia4");
+  System.out.println("sentencia -> do sentencia while(exp);");
 }
-| BREAK PYC {System.out.println("Entrada sentencia5");}
+| BREAK PYC {System.out.println("sentencia -> break;");}
 | bloque {
-  System.out.println("Entrada sentencia6");
+  System.out.println("sentencia -> bloque");
 }
 | RETURN sentenciab {
-  System.out.println("Entrada sentencia7");
+  System.out.println("sentencia -> return sentenciab");
 }
 | SWITCH LPAR exp RPAR LKEY casos RKEY {
-  System.out.println("Entrada sentencia8");
+  System.out.println("sentencia -> switch(exp){ casos }");
 }
 | PRINT exp PYC {
-  System.out.println("Entrada sentencia9");
+  System.out.println("sentencia -> print exp ;");
 }
 | SCAN parteizq {
-  System.out.println("Entrada sentencia10");
+  System.out.println("sentencia -> scan parteizq");
 }
 ;
 
 sentenciaa : %prec IFX
 | ELSE sentencia {
-  System.out.println("Entrada sentenciaa");
+  System.out.println("sentenciaa -> else sentencia");
 }
 ;
 
 sentenciab : exp PYC {
-  System.out.println("Entrada sentneciab1");
+  System.out.println("sentneciab -> exp;");
 }
 | PYC {
-  System.out.println("Entrada sentenciab2");
+  System.out.println("sentenciab -> ;");
 }
 ;
 
-casos : caso casos {System.out.println("Entrada casos1");}
-| predeterminado {System.out.println("Entrada casos2");}
+casos : caso casos {System.out.println("casos -> caso casos");}
+| predeterminado {System.out.println("casos -> predeterminado");}
 |
 ;
 
 caso : CASE opcion PP instrucciones {
-  System.out.println("Entrada caso");
+  System.out.println("caso -> case opcion : instrucciones");
 }
 ;
 
 opcion : LITENT {
+  System.out.println("opcion -> literal_entera");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("int");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITRUNE {
+  System.out.println("opcion -> literal_runa");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("rune");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 ;
 
-predeterminado : DEFAULT PP instrucciones {System.out.println("Entrada predeterminado");}
+predeterminado : DEFAULT PP instrucciones {
+  System.out.println("predeterminado -> default : instrucciones");
+}
 ;
 
-parteizq : ID parteizqp {System.out.println(" Entrada ParteIzquierda");}
+
+parteizq : ID parteizqp {
+  System.out.println("parteizq -> ID parteizqp");
+}
 ;
 
-parteizqp : localizacion {System.out.println("Entrada ParteIzquierdaP");}
+parteizqp : localizacion {
+  System.out.println("parteizqp -> localizacion");
+}
 |
 ;
 
 exp : exp DISY exp {
+  System.out.println("exp -> exp || exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -246,6 +266,7 @@ exp : exp DISY exp {
   }
 }
 | exp CONJ exp {
+  System.out.println("exp -> exp && exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -264,6 +285,7 @@ exp : exp DISY exp {
   }
 }
 | exp EQ exp {
+  System.out.println("exp -> exp == exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -282,6 +304,7 @@ exp : exp DISY exp {
   }
 }
 | exp NEQ exp {
+  System.out.println("exp -> exp != exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -300,6 +323,7 @@ exp : exp DISY exp {
   }
 }
 | exp MAYOR exp {
+  System.out.println("exp -> exp > exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -318,6 +342,7 @@ exp : exp DISY exp {
   }
 }
 | exp MENOR exp {
+  System.out.println("exp -> exp < exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -336,6 +361,7 @@ exp : exp DISY exp {
   }
 }
 | exp MAYEQ exp {
+  System.out.println("exp -> exp >= exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -354,6 +380,7 @@ exp : exp DISY exp {
   }
 }
 | exp MENEQ exp {
+  System.out.println("exp -> exp <= exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -372,6 +399,7 @@ exp : exp DISY exp {
   }
 }
 | exp SUMA exp {
+  System.out.println("exp -> exp + exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -390,6 +418,7 @@ exp : exp DISY exp {
   }
 }
 | exp RESTA exp {
+  System.out.println("exp -> exp - exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -408,7 +437,7 @@ exp : exp DISY exp {
   }
 }
 | exp MULT exp {
-  System.out.println("Entrada exp11");
+  System.out.println("exp -> exp * exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -427,7 +456,7 @@ exp : exp DISY exp {
   }
 }
 | exp DIV exp {
-  System.out.println("Entrada exp11");
+  System.out.println("exp -> exp / exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -446,7 +475,7 @@ exp : exp DISY exp {
   }
 }
 | exp MOD exp {
-  System.out.println("Entrada exp11");
+  System.out.println("exp -> exp % exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -465,7 +494,7 @@ exp : exp DISY exp {
   }
 }
 | exp DIVDIV exp {
-  System.out.println("Entrada exp11");
+  System.out.println("exp -> exp // exp");
   $$ = new ParserValExtended();
   Type tipo1 = ((ParserValExtended)$1).tipo;
   Type tipo2 = ((ParserValExtended)$3).tipo;
@@ -484,117 +513,123 @@ exp : exp DISY exp {
   }
 }
 | NOT exp {
+  System.out.println("exp -> ! exp");
   $$ = new ParserValExtended();
   ((ParserValExtended)$$).dir = nuevaTemporal();
   String a = ampliar(((ParserValExtended)$2).dir, ((ParserValExtended)$2).tipo, ((ParserValExtended)$2).tipo);
   genCode("!", a, null, ((ParserValExtended)$$).dir);
 }
 | RESTA exp %prec NEG {
+  System.out.println("exp -> - exp");
   $$ = new ParserValExtended();
   ((ParserValExtended)$$).dir = nuevaTemporal();
   String a = ampliar(((ParserValExtended)$2).dir, ((ParserValExtended)$2).tipo, ((ParserValExtended)$2).tipo);
   genCode("!", a, null, ((ParserValExtended)$$).dir);
 }
 | LPAR exp RPAR {
-  System.out.println("Entrada exp17");
+  System.out.println("exp -> (exp)");
 }
 | ID expp {
-  System.out.println("Entrada exp18");
+  System.out.println("exp -> id expp");
   $$ = new ParserValExtended($1.sval);
+  int idType = tablaTipos.getId("id");
+  (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | F {
-  System.out.println("Entrada exp19");
+  System.out.println("exp -> false");
   $$ = new ParserValExtended($1.ival);
   int idType = tablaTipos.getId("bool");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITSTRING {
-  System.out.println("Entrada exp20");
+  System.out.println("exp -> literal_cadena");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("string");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | T {
-  System.out.println("Entrada exp21");
+  System.out.println("exp -> true");
   // pendiente
   $$ = new ParserValExtended($1.ival);
   int idType = tablaTipos.getId("bool");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITRUNE {
-  System.out.println("Entrada exp22");
+  System.out.println("exp -> literal_runa");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("rune");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITENT {
-  System.out.println("Entrada exp23");
-  System.out.println($1.sval);
+  System.out.println("exp -> literal_entera");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("int");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
-  System.out.println("Este es el tipo " + ((ParserValExtended)$$).tipo.getName() + " de la tabla de tipos");
 }
 | LITFLOAT {
-  System.out.println("Entrada exp24");
+  System.out.println("exp -> literal_float");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("float");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITDOUBLE {
-  System.out.println("Entrada exp25");
+  System.out.println("exp -> literal_double");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("double");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 | LITCOMPLEX {
-  System.out.println("Entrada exp26");
+  System.out.println("exp -> literal_compleja");
   $$ = new ParserValExtended($1.sval);
   int idType = tablaTipos.getId("complex");
   (((ParserValExtended)$$).tipo) = tablaTipos.getType(idType).get();
 }
 ;
 
-expp : LPAR parametros RPAR {System.out.println("Entrada expp1");}
-| localizacion {System.out.println("Entrada expp2");}
+expp : LPAR parametros RPAR {
+  System.out.println("expp -> (parametros)");
+}
+| localizacion {
+  System.out.println("expp -> localizacion");
+}
 |
 ;
 
 parametros : listparam {
-  System.out.println("Entrada parametros");
+  System.out.println("parametros -> listparam");
 }
 |
 ;
 
 listparam : listparam COMA exp {
-  System.out.println("Entrada listparam");
+  System.out.println("listparam -> listparam, exp");
 }
 | exp {
-  System.out.println("Entrada listparam");
+  System.out.println("listparam -> exp");
 }
 ;
 
 localizacion : arreglo {
-  System.out.println("Entrada localizacion1");
+  System.out.println("localizacion -> arreglo");
 }
 | estructurado {
-  System.out.println("Entrada localizacion2");
+  System.out.println("localizacion -> estructurado");
 }
 ;
 
 arreglo : arreglo LCOR exp RCOR {
-  System.out.println("Entrada arreglo1");
+  System.out.println("arreglo -> arreglo [exp]");
 }
 | LCOR exp RCOR {
-  System.out.println("Entrada arreglo");
+  System.out.println("arreglo -> [exp]");
 }
 ;
 
 estructurado : estructurado P ID {
-  System.out.println("Entrada estructurado");
+  System.out.println("estructurado -> estructurado.ID");
 }
 | P ID {
-  System.out.println("Entrada estructuradop");
+  System.out.println("estructurado -> .ID");
 }
 ;
 
@@ -632,6 +667,10 @@ public void iniciarTipos() {
   tablaTipos.addType("void", 0, -1);
   tablaTipos.addType("string", 0, -1);
   tablaTipos.addType("bool", 1, -1);
+  // esto se agrego para evitar tablaSimbolos por que aun no la usamos
+  tablaTipos.addType("id", 0, -1);
+  tablaTipos.addType("array", 0, -1);
+  tablaTipos.addType("struct", 0, -1);  
 }
 
 public void setYylval(ParserVal yylval) {
@@ -653,7 +692,13 @@ void yyerror(String s)
 boolean compatibles(Type tipo1, Type tipo2){
   return tipo1.equals(tipo2) ||
   (tipo1.getName().equals("float") && tipo2.getName().equals("int")) ||
-  (tipo1.getName().equals("int") && tipo2.getName().equals("float"));
+  (tipo1.getName().equals("int") && tipo2.getName().equals("float"))||
+  (tipo1.getName().equals("id") && tipo2.getName().equals("int")) ||
+  (tipo1.getName().equals("id") && tipo2.getName().equals("float"))||
+  (tipo1.getName().equals("int") && tipo2.getName().equals("id")) ||
+  (tipo1.getName().equals("array") && tipo2.getName().equals("struct"))||
+  (tipo1.getName().equals("float") && tipo2.getName().equals("id")) ||
+  (tipo1.getName().equals("struct") && tipo2.getName().equals("array"));
 }
 
 Type max(Type tipo1, Type tipo2) {
@@ -686,6 +731,13 @@ String ampliar(String dir, Type tipoOrigen, Type tipoDestino) {
   if (tipoOrigen.equals(tipoDestino)) return dir;
   String temp = nuevaTemporal();
   genCode("(cast)", dir, tipoDestino.getName(), temp);
+  return temp;
+}
+
+String reducir(String dir, Type tipoOrigen, Type tipoDestino) {
+  if (tipoOrigen.equals(tipoDestino)) return dir;
+  String temp = nuevaTemporal();
+  genCode("(cast)", dir, tipoOrigen.getName(), temp);
   return temp;
 }
 
